@@ -3,24 +3,24 @@
 
 1º Compilar el código Java
 
-javac -cp "C:\Users\Cris-SX\Downloads\apache-activemq-5.15.8-bin\apache-activemq-5.15.8\activemq-all-5.15.8.jar" -d bin -encoding UTF-8 src/mtis/*.java
+javac -cp "C:\MTIS\apache-activemq-5.15.8\activemq-all-5.15.8.jar" -d bin -encoding UTF-8 src/mtis/*.java
 
 
 2º  Ejecutar el suscriptor (síncrono bloqueante)
 
-java -cp "C:\Users\Cris-SX\Downloads\apache-activemq-5.15.8-bin\apache-activemq-5.15.8\activemq-all-5.15.8.jar;bin" mtis.MTISSubscribe
+java -cp "C:\MTIS\apache-activemq-5.15.8\activemq-all-5.15.8.jar;bin" mtis.MTISSubscribe
 
 
 
 3º Ejecutar el suscriptor asíncrono
 
-java -cp "C:\Users\Cris-SX\Downloads\apache-activemq-5.15.8-bin\apache-activemq-5.15.8\activemq-all-5.15.8.jar;bin" mtis.MTISSubscribeAsync
+java -cp "C:\MTIS\apache-activemq-5.15.8\activemq-all-5.15.8.jar;bin" mtis.MTISSubscribeAsync
 
 
 
 4º Ejecutar el publicador
 
-java -cp "C:\Users\Cris-SX\Downloads\apache-activemq-5.15.8-bin\apache-activemq-5.15.8\activemq-all-5.15.8.jar;bin" mtis.MTISPublisher
+java -cp "C:\MTIS\apache-activemq-5.15.8\activemq-all-5.15.8.jar;bin" mtis.MTISPublisher
 
 
 

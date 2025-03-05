@@ -40,7 +40,7 @@ public class MTISPublisher {
         MessageProducer producer = session.createProducer(destination);
 
         // We will send a small text message in XML format with the history of patient
-        TextMessage message = session.createTextMessage("<history><patient><name>Manolo Garcï¿½a</name></patient></history>");
+        TextMessage message = session.createTextMessage("<history><patient><name>Manolo García</name></patient></history>");
 
         // Here we are sending the message!
         producer.send(message);
