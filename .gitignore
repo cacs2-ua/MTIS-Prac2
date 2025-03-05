@@ -1,0 +1,41 @@
+# Node.js related
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Directory for storing npm-packages
+.pnpm/
+
+# dotenv environment variables file
+.env
+
+# OS related
+.DS_Store
+Thumbs.db
+
+# IDE/Editor related
+.idea/
+*.swp
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.temp
+
+# Coverage directory
+coverage/
+
+# Build directory
+dist/
+build/
+
+# Firebase files
+.firebase/
