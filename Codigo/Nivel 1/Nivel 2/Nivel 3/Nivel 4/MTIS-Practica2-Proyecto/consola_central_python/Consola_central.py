@@ -15,6 +15,18 @@ class ConsolaCentral(stomp.ConnectionListener):
             # Almacenar el contenido recibido
             with latest_temperature_message_lock:
                 latest_temperature_message = frame.body
+    
+    def get_latest_temperature_as_int(self):
+        """
+        Recupera el contenido del último mensaje recibido y lo convierte a entero.
+        Si no se ha recibido ningún mensaje o la conversión falla, devuelve None.
+        """
+        with latest_temperature_message_lock:
+            received_content = latest_temperature_message if latest_temperature_message is not None else "N/A"
+        try:
+            return int(received_content)
+        except ValueError:
+            return None
 
 def main():
     conn = stomp.Connection12(host_and_ports=[("localhost", 61613)])
@@ -32,12 +44,12 @@ def main():
     try:
         while True:
             # Recuperar el contenido del último mensaje recibido (si no hay, se usa "N/A")
-            with latest_temperature_message_lock:
-                received_content = latest_temperature_message if latest_temperature_message is not None else "N/A"
+            temperature_numeric_value = listener.get_latest_temperature_as_int()
             
             # Crear el cuerpo JSON incluyendo el contenido recibido
             json_body = json.dumps({
-                "frio": True
+                "frio": True,
+                "temperature_numeric_value": temperature_numeric_value
             })
             
             conn.send(
@@ -48,7 +60,7 @@ def main():
                     "amq-msg-type": "text"
                 }
             )
-            time.sleep(1)
+            time.sleep(4)
     except KeyboardInterrupt:
         print("Disconnecting...")
         conn.disconnect()

@@ -49,7 +49,7 @@ public class Oficina1 implements MessageListener {
                 TextMessage message = session.createTextMessage(String.valueOf(randomNumber));
                 lecturas_temperaturas_oficina1_producer.send(message);
 
-                Thread.sleep(1000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
