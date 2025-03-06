@@ -1,20 +1,26 @@
 package mtis;
 
+import java.util.concurrent.CountDownLatch;
+
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
-public class Oficina1 {
+public class Oficina1 implements MessageListener {
 
     public static void main(String []args) throws JMSException {
         // URL of the JMS server.
 		String url = "tcp://localhost:61616";
+
+        CountDownLatch latch = new CountDownLatch(1);
 
         // Getting JMS connection from the server and starting it
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
@@ -34,7 +40,32 @@ public class Oficina1 {
 
         MessageProducer lecturas_temperaturas_oficina1_producer = session.createProducer(lecturas_temperaturas_oficina1_destination);
 
-        MessageProducer actuador_temperatura_oficina1_consumer = session.createConsumer(actuador_temperatura_oficina1_destination);
+        MessageConsumer actuador_temperatura_oficina1_consumer = session.createConsumer(actuador_temperatura_oficina1_destination);
+
+
+        actuador_temperatura_oficina1_consumer.setMessageListener(new Oficina1());
+
+        while (true) {
+            try {
+                TextMessage message = session.createObjectMessage(5);
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onMessage(Message message) {
+        try {
+            if (message instanceof TextMessage) {
+	            TextMessage textMessage = (TextMessage) message;
+	            System.out.println("Received message '"
+	                + textMessage.getText() + "'");
+            }
+        } catch (JMSException e) {
+            System.out.println("Got a JMS Exception!");
+        }
     }
     
 }
