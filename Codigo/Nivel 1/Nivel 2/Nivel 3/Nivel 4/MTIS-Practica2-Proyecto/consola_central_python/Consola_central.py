@@ -18,15 +18,23 @@ class ConsolaCentral(stomp.ConnectionListener):
     
     def get_latest_temperature_as_int(self):
         """
-        Recupera el contenido del último mensaje recibido y lo convierte a entero.
+        Recupera el contenido del último mensaje recibido, lo interpreta como JSON y extrae
+        el valor entero asociado a la clave "temperature".
         Si no se ha recibido ningún mensaje o la conversión falla, devuelve None.
         """
         with latest_temperature_message_lock:
-            received_content = latest_temperature_message if latest_temperature_message is not None else "N/A"
-        try:
-            return int(received_content)
-        except ValueError:
+            received_content = latest_temperature_message if latest_temperature_message is not None else None
+        if received_content is None:
             return None
+        try:
+            # Interpretar el contenido como JSON
+            data = json.loads(received_content)
+            # Extraer el valor de "temperature"
+            temperature = data.get("temperature")
+            return int(temperature) if temperature is not None else None
+        except (ValueError, json.JSONDecodeError):
+            return None
+
 
 def main():
     conn = stomp.Connection12(host_and_ports=[("localhost", 61613)])

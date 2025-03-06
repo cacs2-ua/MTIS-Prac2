@@ -22,14 +22,14 @@ public class Oficina1 implements MessageListener {
         this.temperature = 0; // Valor inicial
     }
 
-    // M閠odo que inicializa la conexi髇 JMS y env韆 mensajes peri骴icamente
+    // M茅todo que inicializa la conexi贸n JMS y env铆a mensajes peri贸dicamente
     public void start() throws JMSException {
         System.out.println("ComienzOOOo");
         String url = "tcp://localhost:61616";
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        // Crear conexi髇 y sesi髇
+        // Crear conexi贸n y sesi贸n
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();
@@ -44,14 +44,21 @@ public class Oficina1 implements MessageListener {
         MessageConsumer consumer = session.createConsumer(actuador_dest);
         consumer.setMessageListener(this);
 
-        // Bucle para enviar mensajes peri骴icamente
+        // Bucle para enviar mensajes peri贸dicamente
         while (true) {
             try {
                 // Actualiza el atributo 'temperature' con el valor obtenido de Utils
                 this.temperature = Utils.manejarTemperaturaRandomIndicator();
 
-                // Se env韆 el valor de 'temperature'
-                TextMessage message = session.createTextMessage(String.valueOf(this.temperature));
+                // Construir el JSON a enviar con el formato deseado
+                String jsonPayload = "{"
+                        + "\"temperature\": " + this.temperature + ","
+                        + "\"cold_system_activated\": false,"
+                        + "\"heat_system_activated\": false"
+                        + "}";
+                
+                // Crear el mensaje con el JSON
+                TextMessage message = session.createTextMessage(jsonPayload);
                 producer.send(message);
 
                 Thread.sleep(4000);
