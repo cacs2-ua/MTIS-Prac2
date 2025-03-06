@@ -1,5 +1,7 @@
+# Consola_central.py
 import time
 import stomp
+import json  # <-- Añadir import
 
 class ConsolaCentral(stomp.ConnectionListener):
     def on_message(self, frame):
@@ -13,7 +15,6 @@ def main():
     conn.connect(wait=True)
     
     lecturas_temperaturas_oficina1_destination  = "/topic/lecturas_temperaturas_oficina1"
-
     actuador_temperatura_oficina1_destination = "/topic/actuador_temperatura_oficina1"
 
     conn.subscribe(destination=lecturas_temperaturas_oficina1_destination, id=1, ack='auto')
@@ -22,10 +23,17 @@ def main():
 
     try:
         while True:
-            conn.send(destination=actuador_temperatura_oficina1_destination, 
-                    body="Envío de prueba de temperatura",
-                    headers={"content-type": "text/plain", "amq-msg-type": "text"})
+            # Crear cuerpo JSON
+            json_body = json.dumps({"frio": True})  # <-- Nuevo cuerpo
             
+            conn.send(
+                destination=actuador_temperatura_oficina1_destination, 
+                body=json_body,  # <-- Usar JSON
+                headers={
+                    "content-type": "application/json",  # <-- Header modificado
+                    "amq-msg-type": "text"
+                }
+            )
             time.sleep(1)
     except KeyboardInterrupt:
         print("Disconnecting...")
