@@ -19,6 +19,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 public class Oficina1 implements MessageListener {
 
     public static void main(String []args) throws JMSException {
+    	System.out.println("Comienzo");
         // URL of the JMS server.
 		String url = "tcp://localhost:61616";
 
@@ -49,7 +50,7 @@ public class Oficina1 implements MessageListener {
 
         while (true) {
             try {
-                ObjectMessage message = session.createObjectMessage(5);
+                TextMessage message = session.createTextMessage("5");
                 lecturas_temperaturas_oficina1_producer.send(message);
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -62,14 +63,16 @@ public class Oficina1 implements MessageListener {
     public void onMessage(Message message) {
         try {
             if (message instanceof TextMessage) {
-	            TextMessage textMessage = (TextMessage) message;
-	            System.out.println("Received message '"
-	                + textMessage.getText() + "'");
+                TextMessage textMessage = (TextMessage) message;
+                System.out.println("Received message '" + textMessage.getText() + "'");
+            } else {
+                System.out.println("Received message of type: " + message.getClass().getName());
             }
         } catch (JMSException e) {
             System.out.println("Got a JMS Exception!");
         }
     }
+    
 
 
     

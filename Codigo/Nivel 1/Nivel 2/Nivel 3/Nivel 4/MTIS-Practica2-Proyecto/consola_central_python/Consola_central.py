@@ -13,7 +13,7 @@ def main():
     
     lecturas_temperaturas_oficina1_destination  = "/topic/lecturas_temperaturas_oficina1"
 
-    actuador_temperatura_oficina1_destination = "/topic/actuador_temperatura_oficina1_destination"
+    actuador_temperatura_oficina1_destination = "/topic/actuador_temperatura_oficina1"
 
     conn.subscribe(destination=lecturas_temperaturas_oficina1_destination, id=1, ack='auto')
 
