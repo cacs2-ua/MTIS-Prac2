@@ -12,42 +12,47 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import java.util.Random;
 
 public class Oficina1 implements MessageListener {
 
-    public static void main(String []args) throws JMSException {
+    // Atributo privado para almacenar la temperatura
+    private int temperature;
+
+    public Oficina1() {
+        this.temperature = 0; // Valor inicial
+    }
+
+    // Método que inicializa la conexión JMS y envía mensajes periódicamente
+    public void start() throws JMSException {
         System.out.println("ComienzOOOo");
-        // URL of the JMS server.
         String url = "tcp://localhost:61616";
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        // Getting JMS connection from the server and starting it
+        // Crear conexión y sesión
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();
-
-        // JMS messages are sent and received using a Session. We will
-        // create here a non-transactional session object. If you want
-        // to use transactions you should set the first parameter to 'true'
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        Destination lecturas_temperaturas_oficina1_destination = session.createTopic("lecturas_temperaturas_oficina1");
-        Destination actuador_temperatura_oficina1_destination = session.createTopic("actuador_temperatura_oficina1");
+        // Crear destinos
+        Destination lecturas_dest = session.createTopic("lecturas_temperaturas_oficina1");
+        Destination actuador_dest = session.createTopic("actuador_temperatura_oficina1");
 
-        MessageProducer lecturas_temperaturas_oficina1_producer = session.createProducer(lecturas_temperaturas_oficina1_destination);
-        MessageConsumer actuador_temperatura_oficina1_consumer = session.createConsumer(actuador_temperatura_oficina1_destination);
+        // Crear productor y consumidor
+        MessageProducer producer = session.createProducer(lecturas_dest);
+        MessageConsumer consumer = session.createConsumer(actuador_dest);
+        consumer.setMessageListener(this);
 
-        actuador_temperatura_oficina1_consumer.setMessageListener(new Oficina1());
-
-        int randomNumber = 0;
+        // Bucle para enviar mensajes periódicamente
         while (true) {
             try {
-                randomNumber = Utils.manejarTemperaturaRandomIndicator();
+                // Actualiza el atributo 'temperature' con el valor obtenido de Utils
+                this.temperature = Utils.manejarTemperaturaRandomIndicator();
 
-                TextMessage message = session.createTextMessage(String.valueOf(randomNumber));
-                lecturas_temperaturas_oficina1_producer.send(message);
+                // Se envía el valor de 'temperature'
+                TextMessage message = session.createTextMessage(String.valueOf(this.temperature));
+                producer.send(message);
 
                 Thread.sleep(4000);
             } catch (InterruptedException e) {
@@ -68,5 +73,10 @@ public class Oficina1 implements MessageListener {
         } catch (JMSException e) {
             System.out.println("Got a JMS Exception!");
         }
+    }
+
+    public static void main(String[] args) throws JMSException {
+        Oficina1 oficina = new Oficina1();
+        oficina.start();
     }
 }
