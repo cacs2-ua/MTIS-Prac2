@@ -3,7 +3,7 @@ import stomp
 import json
 import threading
 
-# Global variable to store the last received message
+# Global variable to store the last received message 
 latest_temperature_message = None
 latest_temperature_message_lock = threading.Lock()
 
