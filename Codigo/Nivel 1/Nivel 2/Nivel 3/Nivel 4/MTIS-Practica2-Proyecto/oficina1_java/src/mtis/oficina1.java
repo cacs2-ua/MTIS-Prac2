@@ -19,7 +19,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 public class Oficina1 implements MessageListener {
 
     public static void main(String []args) throws JMSException {
-    	System.out.println("Comienzo");
+    	System.out.println("ComienzOOOo");
         // URL of the JMS server.
 		String url = "tcp://localhost:61616";
 

@@ -3,7 +3,8 @@ import stomp
 
 class ConsolaCentral(stomp.ConnectionListener):
     def on_message(self, frame):
-        print(f"Received message: {frame.body}")
+        if frame.body.strip() != "":
+            print(f"Received message: {frame.body}")
 
 def main():
     conn = stomp.Connection12(host_and_ports=[("localhost", 61613)])
@@ -21,7 +22,9 @@ def main():
 
     try:
         while True:
-            conn.send(destination=actuador_temperatura_oficina1_destination, body="Envío de prueba de temperatura")
+            conn.send(destination=actuador_temperatura_oficina1_destination, 
+                      body="Envío de prueba de temperatura",
+                      headers={"content-type": "text/plain"})
             time.sleep(1)
     except KeyboardInterrupt:
         print("Disconnecting...")
