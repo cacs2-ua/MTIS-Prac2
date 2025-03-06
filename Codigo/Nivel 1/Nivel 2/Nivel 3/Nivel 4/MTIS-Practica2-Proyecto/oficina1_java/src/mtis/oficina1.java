@@ -24,7 +24,7 @@ public class Oficina1 implements MessageListener {
 		String url = "tcp://localhost:61616";
 
         CountDownLatch latch = new CountDownLatch(1);
-
+ 
         // Getting JMS connection from the server and starting it
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();

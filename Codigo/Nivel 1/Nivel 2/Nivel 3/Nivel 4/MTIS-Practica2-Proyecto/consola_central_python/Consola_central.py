@@ -23,8 +23,9 @@ def main():
     try:
         while True:
             conn.send(destination=actuador_temperatura_oficina1_destination, 
-                      body="Envío de prueba de temperatura",
-                      headers={"content-type": "text/plain"})
+                    body="Envío de prueba de temperatura",
+                    headers={"content-type": "text/plain", "amq-msg-type": "text"})
+            
             time.sleep(1)
     except KeyboardInterrupt:
         print("Disconnecting...")
