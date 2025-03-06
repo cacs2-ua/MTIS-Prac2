@@ -41,23 +41,13 @@ public class Oficina1 implements MessageListener {
 
         actuador_temperatura_oficina1_consumer.setMessageListener(new Oficina1());
 
-        Random random = new Random();
-        int temperaturaRandomIndicator = 0;
         int randomNumber = 0;
         while (true) {
             try {
-                temperaturaRandomIndicator = temperaturaRandomIndicator % 3;
+                randomNumber = Utils.manejarTemperaturaRandomIndicator();
 
-                if (temperaturaRandomIndicator == 0) {
-                    randomNumber = random.nextInt(16) + 15; // 15 a 30 (ambos inclusive)
-                } else if (temperaturaRandomIndicator == 1) {
-                    randomNumber = random.nextInt(15); // 15 a 30 (ambos inclusive)
-                } else {
-                    randomNumber = random.nextInt(15) + 31; // 30 a 45 (ambos inclusive)
-                }
                 TextMessage message = session.createTextMessage(String.valueOf(randomNumber));
                 lecturas_temperaturas_oficina1_producer.send(message);
-                temperaturaRandomIndicator++;
 
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

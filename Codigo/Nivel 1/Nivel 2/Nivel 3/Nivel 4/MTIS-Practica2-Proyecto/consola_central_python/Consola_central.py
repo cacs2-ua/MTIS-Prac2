@@ -4,17 +4,17 @@ import json
 import threading
 
 # Variable global para almacenar el último mensaje recibido
-latest_message = None
-latest_message_lock = threading.Lock()
+latest_temperature_message = None
+latest_temperature_message_lock = threading.Lock()
 
 class ConsolaCentral(stomp.ConnectionListener):
     def on_message(self, frame):
-        global latest_message
+        global latest_temperature_message
         if frame.body.strip() != "":
             print(f"Received message: {frame.body}")
             # Almacenar el contenido recibido
-            with latest_message_lock:
-                latest_message = frame.body
+            with latest_temperature_message_lock:
+                latest_temperature_message = frame.body
 
 def main():
     conn = stomp.Connection12(host_and_ports=[("localhost", 61613)])
@@ -32,8 +32,8 @@ def main():
     try:
         while True:
             # Recuperar el contenido del último mensaje recibido (si no hay, se usa "N/A")
-            with latest_message_lock:
-                received_content = latest_message if latest_message is not None else "N/A"
+            with latest_temperature_message_lock:
+                received_content = latest_temperature_message if latest_temperature_message is not None else "N/A"
             
             # Crear el cuerpo JSON incluyendo el contenido recibido
             json_body = json.dumps({
