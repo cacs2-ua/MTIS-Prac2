@@ -6,9 +6,11 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
@@ -47,7 +49,8 @@ public class Oficina1 implements MessageListener {
 
         while (true) {
             try {
-                TextMessage message = session.createObjectMessage(5);
+                ObjectMessage message = session.createObjectMessage(5);
+                lecturas_temperaturas_oficina1_producer.send(message);
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -67,5 +70,7 @@ public class Oficina1 implements MessageListener {
             System.out.println("Got a JMS Exception!");
         }
     }
+
+
     
 }
