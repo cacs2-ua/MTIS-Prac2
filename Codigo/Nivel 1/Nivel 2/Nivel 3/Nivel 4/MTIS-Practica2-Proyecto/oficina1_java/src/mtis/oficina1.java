@@ -12,6 +12,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import java.util.Random;
 
 public class Oficina1 implements MessageListener {
 
@@ -40,9 +41,11 @@ public class Oficina1 implements MessageListener {
 
         actuador_temperatura_oficina1_consumer.setMessageListener(new Oficina1());
 
+        Random random = new Random();
         while (true) {
             try {
-                TextMessage message = session.createTextMessage("5");
+                int randomNumber = random.nextInt(46); // 0 a 45 (inclusive)
+                TextMessage message = session.createTextMessage(String.valueOf(randomNumber));
                 lecturas_temperaturas_oficina1_producer.send(message);
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
