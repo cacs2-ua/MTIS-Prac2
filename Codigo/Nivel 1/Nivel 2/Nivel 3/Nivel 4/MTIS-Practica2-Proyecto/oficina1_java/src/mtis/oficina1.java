@@ -43,7 +43,7 @@ public class Oficina1 implements MessageListener {
     }
     
     /**
-     * Configura la conexión JMS, la sesión, los destinos, el productor y el consumidor.
+     * Configura la conexion JMS, la sesion, los destinos, el productor y el consumidor.
      * Se asigna a este objeto como listener de los mensajes recibidos.
      */
     private JMSComponents setupJMS() throws JMSException {
@@ -52,7 +52,7 @@ public class Oficina1 implements MessageListener {
         
         CountDownLatch latch = new CountDownLatch(1);
         
-        // Crear conexión y sesión
+        // Crear conexion y sesion
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();
@@ -72,10 +72,10 @@ public class Oficina1 implements MessageListener {
     
     /**
      * Actualiza el atributo 'temperature' usando Utils, construye el payload JSON,
-     * crea un TextMessage y lo envía mediante el productor.
+     * crea un TextMessage y lo envï¿½a mediante el productor.
      */
     private void sendTemperatureMessage(Session session, MessageProducer producer) throws JMSException {
-        // Actualizar la temperatura (por ejemplo, usando un método de utilidad)
+        // Actualizar la temperatura (por ejemplo, usando un mï¿½todo de utilidad)
         this.temperature = Utils.manejarTemperaturaRandomIndicator();
         
         // Construir el payload JSON
@@ -92,8 +92,8 @@ public class Oficina1 implements MessageListener {
     }
     
     /**
-     * Inicializa la conexión JMS y programa el envío periódico de mensajes
-     * utilizando un ScheduledExecutorService para mantener la asincronía.
+     * Inicializa la conexiï¿½n JMS y programa el envï¿½o periï¿½dico de mensajes
+     * utilizando un ScheduledExecutorService para mantener la asincronï¿½a.
      */
     public void start() throws JMSException {
         JMSComponents jmsComponents = setupJMS();
