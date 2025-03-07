@@ -22,11 +22,53 @@ public class Oficina1 implements MessageListener {
 
     // Atributo para almacenar la temperatura
     private int temperature;
+    
+    private boolean coldSystemActivated = false;
+    
+    private boolean heatSystemActivated = false;
+
+    public static final int TEMPERATURE_DIFFERENCE = 2;
+
+    public static final int COLD_SYSTEM_STOP_TEMPERATURE = 23;
+    public static final int HEAT_SYSTEM_STOP_TEMPERATURE = 23;
+
+    public int getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
+    }
+    
+    // getters y setters para coldSystemActivated y heatSystemActivated
+    public boolean isColdSystemActivated() {
+        return coldSystemActivated;
+    }
+
+    public void setColdSystemActivated(boolean coldSystemActivated) {
+        this.coldSystemActivated = coldSystemActivated;
+    }
+
+    public boolean isHeatSystemActivated() {
+        return heatSystemActivated;
+    }
+
+    public void setHeatSystemActivated(boolean heatSystemActivated) {
+        this.heatSystemActivated = heatSystemActivated;
+    }
+
+    public void incrementTemperature() {
+        this.temperature += TEMPERATURE_DIFFERENCE;
+    }
+
+    public void decrementTemperature() {
+        this.temperature -= TEMPERATURE_DIFFERENCE;
+    }
 
     public Oficina1() {
         this.temperature = 0; // Valor inicial
     }
-    
+
     /**
      * Clase interna de ayuda para almacenar los componentes JMS.
      */
@@ -45,7 +87,7 @@ public class Oficina1 implements MessageListener {
     }
     
     /**
-     * Configura la conexión JMS, la sesión, los destinos, el productor y el consumidor.
+     * Configura la conexiï¿½n JMS, la sesiï¿½n, los destinos, el productor y el consumidor.
      * Se asigna a este objeto como listener de los mensajes recibidos.
      */
     private JMSComponents setupJMS() throws JMSException {
@@ -54,7 +96,7 @@ public class Oficina1 implements MessageListener {
         
         CountDownLatch latch = new CountDownLatch(1);
         
-        // Crear conexión y sesión
+        // Crear conexiï¿½n y sesiï¿½n
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();
@@ -90,28 +132,67 @@ public class Oficina1 implements MessageListener {
     
     /**
      * Actualiza el atributo 'temperature' usando Utils, construye el payload JSON,
-     * crea un TextMessage y lo envía mediante el productor.
+     * crea un TextMessage y lo envia mediante el productor.
      */
     private void sendTemperatureMessage(Session session, MessageProducer producer) throws JMSException {
-        // Actualizar la temperatura (por ejemplo, usando un método de utilidad)
+        // Actualizar la temperatura (por ejemplo, usando un metodo de utilidad)
         this.temperature = Utils.manejarTemperaturaRandomIndicator();
         
         // Construir el payload JSON
         String jsonPayload = "{"
                 + "\"office\": \"office1\","
                 + "\"temperature\": " + this.temperature + ","
-                + "\"cold_system_activated\": false,"
-                + "\"heat_system_activated\": false"
+                + "\"cold_system_activated\": " + false + ","
+                + "\"heat_system_activated\": " + false + ","
                 + "}";
         
         // Crear y enviar el TextMessage
         TextMessage message = session.createTextMessage(jsonPayload);
         producer.send(message);
     }
+
+    public void manageColdSystem(Session session, MessageProducer producer) throws JMSException {
+        this.decrementTemperature();
+
+        String jsonPayload = "{"
+        + "\"office\": \"office1\","
+        + "\"temperature\": " + this.getTemperature() + ","
+        + "\"cold_system_activated\": " + true + ","
+        + "\"heat_system_activated\": " + false + 
+        "}";
+
+
+        TextMessage message = session.createTextMessage(jsonPayload);
+        producer.send(message);
+
+        if (this.getTemperature() <= Oficina1.COLD_SYSTEM_STOP_TEMPERATURE) {
+            this.setColdSystemActivated(false);
+        }
+    }
+
+    
+    public void manageHeatSystem(Session session, MessageProducer producer) throws JMSException {
+        this.incrementTemperature();
+
+        String jsonPayload = "{"
+        + "\"office\": \"office1\","
+        + "\"temperature\": " + this.getTemperature() + ","
+        + "\"cold_system_activated\": " + false + ","
+        + "\"heat_system_activated\": " + true + "}"
+        + "}";
+
+        TextMessage message = session.createTextMessage(jsonPayload);
+        producer.send(message);
+
+        if (this.getTemperature() >= Oficina1.HEAT_SYSTEM_STOP_TEMPERATURE) {
+            this.setColdSystemActivated(false);
+        }
+    }
+
     
     /**
-     * Inicializa la conexión JMS y programa el envío periódico de mensajes
-     * utilizando un ScheduledExecutorService para mantener la asincronía.
+     * Inicializa la conexion JMS y programa el envio periodico de mensajes
+     * utilizando un ScheduledExecutorService para mantener la asincronna.
      */
     public void start() throws JMSException {
         JMSComponents jmsComponents = setupJMS();
@@ -127,7 +208,20 @@ public class Oficina1 implements MessageListener {
         };
         executor.scheduleAtFixedRate(sendTask, 0, 2, TimeUnit.SECONDS);
     }
-    
+
+    public void startTemperatureSystem(int temperature) {
+        if (temperature < 15) {
+            this.setColdSystemActivated(false);
+            this.setHeatSystemActivated(true);
+        } else if (temperature > 30) {
+            this.setColdSystemActivated(true);
+            this.setHeatSystemActivated(false);
+        } else {
+            this.setColdSystemActivated(false);
+            this.setHeatSystemActivated(false);
+        }
+    }
+
     @Override
     public void onMessage(Message message) {
         try {
@@ -138,6 +232,7 @@ public class Oficina1 implements MessageListener {
                 Integer temperatureValue = extractTemperature(textMessage);
                 if (temperatureValue != null) {
                     System.out.println("Extracted temperature: " + temperatureValue);
+                    this.setTemperature(temperatureValue);
                 } else {
                     System.out.println("Temperature value is null or not provided.");
                 }
