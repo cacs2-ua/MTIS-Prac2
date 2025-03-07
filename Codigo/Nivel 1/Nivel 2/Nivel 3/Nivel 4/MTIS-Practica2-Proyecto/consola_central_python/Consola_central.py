@@ -8,10 +8,10 @@ latest_temperature_message = None
 latest_temperature_message_lock = threading.Lock()
 
 class ConsolaCentral(stomp.ConnectionListener):
-    COLD_SYSTEM_ATIVATION_TEMPERATURE = 15
+    COLD_SYSTEM_ATIVATION_TEMPERATURE = 30
     COLD_SYSTEM_STOP_TEMPERATURE = 23
 
-    HEAT_SYSTEM_ATIVATION_TEMPERATURE = 30
+    HEAT_SYSTEM_ATIVATION_TEMPERATURE = 15
     HEAT_SYSTEM_STOP_TEMPERATURE = 23
 
 
@@ -35,11 +35,12 @@ class ConsolaCentral(stomp.ConnectionListener):
             return None
         try:
             data = json.loads(received_content)
+            office = data.get("office")
             temperature = data.get("temperature")
             temperature_numeric_value = int(temperature) if temperature is not None else None
             cold_system_activated = data.get("cold_system_activated")
             heat_system_activated = data.get("heat_system_activated")
-            return temperature_numeric_value, cold_system_activated, heat_system_activated
+            return office, temperature_numeric_value, cold_system_activated, heat_system_activated
         except (ValueError, json.JSONDecodeError):
             return None
         
@@ -47,13 +48,45 @@ class ConsolaCentral(stomp.ConnectionListener):
                                   conn, 
                                   listener, 
                                   lecturas_dest, 
-                                  actuador_des,
+                                  actuador_dest,
+                                  office,
                                   temperature_numeric_value, 
                                   cold_system_activated, 
                                   heat_system_activated):
-        if temperature_numeric_value
-        return None
+        if (temperature_numeric_value > self.COLD_SYSTEM_ATIVATION_TEMPERATURE
+            and
+            not cold_system_activated):
+            conn.send(
+                destination=actuador_dest, 
+                body=json.dumps({"activate_cold_system": True}),
+                headers={"content-type": "application/json", "amq-msg-type": "text"}
+            )
+        
+        elif (temperature_numeric_value <= self.COLD_SYSTEM_STOP_TEMPERATURE
+            and
+            cold_system_activated):
+            conn.send(
+                destination=actuador_dest, 
+                body=json.dumps({"stop_cold_system": True}),
+                headers={"content-type": "application/json", "amq-msg-type": "text"}
+            )
+        
+        if (temperature_numeric_value < self.HEAT_SYSTEM_ATIVATION_TEMPERATURE
+            and
+            not heat_system_activated):
+            conn.send(
+                destination=actuador_dest, 
+                body=json.dumps({"activate_heat_system": True}),
+                headers={"content-type": "application/json", "amq-msg-type": "text"}
+            )
 
+        elif (temperature_numeric_value >= self.HEAT_SYSTEM_STOP_TEMPERATURE):
+            conn.send(
+                destination=actuador_dest, 
+                body=json.dumps({"stop_heat_system": True}),
+                headers={"content-type": "application/json", "amq-msg-type": "text"}
+            )
+        
     @staticmethod
     def setup_connection():
         """
@@ -86,7 +119,7 @@ def main():
            temperature_data = listener.get_latest_temperature_data()
 
            if temperature_data is not None:
-                temperature_numeric_value, cold_system_activated, heat_system_activated = temperature_data
+                office, temperature_numeric_value, cold_system_activated, heat_system_activated = temperature_data
             
                 # Create the JSON payload including the received content
                 json_body = json.dumps({
