@@ -31,7 +31,7 @@ public final class Utils {
         } else if (indicadorModulo == 6) {
             randomNumber = random.nextInt(6) + 25;
         } else if (indicadorModulo == 7) {
-            randomNumber = random.nextInt(6) + 40;
+            randomNumber = random.nextInt(15) + 31;
         }
         temperaturaRandomIndicator++;
         return randomNumber;
