@@ -86,7 +86,7 @@ def main():
                     }
                 )
 
-           time.sleep(4)
+           time.sleep(2)
     except KeyboardInterrupt:
         print("Disconnecting...")
         conn.disconnect()

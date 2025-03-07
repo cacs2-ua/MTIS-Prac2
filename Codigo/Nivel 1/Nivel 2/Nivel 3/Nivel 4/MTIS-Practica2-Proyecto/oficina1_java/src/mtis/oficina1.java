@@ -78,17 +78,19 @@ public class Oficina1 implements MessageListener {
         
         // Build the JSON payload with the desired format
         String jsonPayload = "{"
+                + "\"office\": \"office1\","
                 + "\"temperature\": " + this.temperature + ","
                 + "\"cold_system_activated\": false,"
                 + "\"heat_system_activated\": false"
                 + "}";
+
         
         // Create the TextMessage with the JSON payload and send it
         TextMessage message = session.createTextMessage(jsonPayload);
         producer.send(message);
         
-        // Pause for 4000 milliseconds
-        Thread.sleep(4000);
+        // Pause for 2000 milliseconds
+        Thread.sleep(2000);
     }
     
     /**
