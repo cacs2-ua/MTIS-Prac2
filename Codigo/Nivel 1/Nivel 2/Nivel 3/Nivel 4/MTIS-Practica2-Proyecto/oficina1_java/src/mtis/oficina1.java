@@ -1,6 +1,9 @@
 package mtis;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -15,15 +18,15 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 public class Oficina1 implements MessageListener {
 
-    // Private attribute to store the temperature
+    // Atributo para almacenar la temperatura
     private int temperature;
 
     public Oficina1() {
-        this.temperature = 0; // Initial value
+        this.temperature = 0; // Valor inicial
     }
     
     /**
-     * Helper inner class to hold the JMS components.
+     * Clase interna de ayuda para almacenar los componentes JMS.
      */
     private static class JMSComponents {
         public Connection connection;
@@ -40,8 +43,8 @@ public class Oficina1 implements MessageListener {
     }
     
     /**
-     * Sets up the JMS connection, session, destinations, producer, and consumer.
-     * The consumer's message listener is set to this instance.
+     * Configura la conexión JMS, la sesión, los destinos, el productor y el consumidor.
+     * Se asigna a este objeto como listener de los mensajes recibidos.
      */
     private JMSComponents setupJMS() throws JMSException {
         System.out.println("ComienzOOOo");
@@ -49,17 +52,17 @@ public class Oficina1 implements MessageListener {
         
         CountDownLatch latch = new CountDownLatch(1);
         
-        // Create connection and session
+        // Crear conexión y sesión
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
-        // Create destinations
+        // Crear destinos
         Destination lecturasDest = session.createTopic("lecturas_temperaturas_oficina1");
         Destination actuadorDest = session.createTopic("actuador_temperatura_oficina1");
         
-        // Create producer and consumer
+        // Crear productor y consumidor
         MessageProducer producer = session.createProducer(lecturasDest);
         MessageConsumer consumer = session.createConsumer(actuadorDest);
         consumer.setMessageListener(this);
@@ -68,45 +71,43 @@ public class Oficina1 implements MessageListener {
     }
     
     /**
-     * This method updates the temperature attribute using Utils,
-     * builds the JSON payload, creates a TextMessage, sends it through the producer,
-     * and then pauses for 4000 milliseconds.
+     * Actualiza el atributo 'temperature' usando Utils, construye el payload JSON,
+     * crea un TextMessage y lo envía mediante el productor.
      */
-    private void sendTemperatureMessage(Session session, MessageProducer producer) throws JMSException, InterruptedException {
-        // Update the 'temperature' attribute using Utils
+    private void sendTemperatureMessage(Session session, MessageProducer producer) throws JMSException {
+        // Actualizar la temperatura (por ejemplo, usando un método de utilidad)
         this.temperature = Utils.manejarTemperaturaRandomIndicator();
         
-        // Build the JSON payload with the desired format
+        // Construir el payload JSON
         String jsonPayload = "{"
                 + "\"office\": \"office1\","
                 + "\"temperature\": " + this.temperature + ","
                 + "\"cold_system_activated\": false,"
                 + "\"heat_system_activated\": false"
                 + "}";
-
         
-        // Create the TextMessage with the JSON payload and send it
+        // Crear y enviar el TextMessage
         TextMessage message = session.createTextMessage(jsonPayload);
         producer.send(message);
-        
-        // Pause for 2000 milliseconds
-        Thread.sleep(2000);
     }
     
     /**
-     * Initializes the JMS connection and periodically sends messages.
+     * Inicializa la conexión JMS y programa el envío periódico de mensajes
+     * utilizando un ScheduledExecutorService para mantener la asincronía.
      */
     public void start() throws JMSException {
         JMSComponents jmsComponents = setupJMS();
         
-        // Loop to periodically send messages
-        while (true) {
+        // Usar ScheduledExecutorService para enviar mensajes cada 2 segundos.
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        Runnable sendTask = () -> {
             try {
                 sendTemperatureMessage(jmsComponents.session, jmsComponents.producer);
-            } catch (InterruptedException e) {
+            } catch (JMSException e) {
                 e.printStackTrace();
             }
-        }
+        };
+        executor.scheduleAtFixedRate(sendTask, 0, 2, TimeUnit.SECONDS);
     }
     
     @Override
