@@ -8,6 +8,13 @@ latest_temperature_message = None
 latest_temperature_message_lock = threading.Lock()
 
 class ConsolaCentral(stomp.ConnectionListener):
+    COLD_SYSTEM_ATIVATION_TEMPERATURE = 15
+    COLD_SYSTEM_STOP_TEMPERATURE = 23
+
+    HEAT_SYSTEM_ATIVATION_TEMPERATURE = 30
+    HEAT_SYSTEM_STOP_TEMPERATURE = 23
+
+
     def on_message(self, frame):
         global latest_temperature_message
         if frame.body.strip() != "":
@@ -36,7 +43,15 @@ class ConsolaCentral(stomp.ConnectionListener):
         except (ValueError, json.JSONDecodeError):
             return None
         
-    def manage_temperature_system(self):
+    def manage_temperature_system(self, 
+                                  conn, 
+                                  listener, 
+                                  lecturas_dest, 
+                                  actuador_des,
+                                  temperature_numeric_value, 
+                                  cold_system_activated, 
+                                  heat_system_activated):
+        if temperature_numeric_value
         return None
 
     @staticmethod
