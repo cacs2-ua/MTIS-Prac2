@@ -195,19 +195,68 @@ public class Oficina1 implements MessageListener {
      * utilizando un ScheduledExecutorService para mantener la asincronna.
      */
     public void start() throws JMSException {
-        JMSComponents jmsComponents = setupJMS();
+        final JMSComponents jmsComponents = setupJMS();
         
-        // Usar ScheduledExecutorService para enviar mensajes cada 2 segundos.
-        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        Runnable sendTask = () -> {
-            try {
-                sendTemperatureMessage(jmsComponents.session, jmsComponents.producer);
-            } catch (JMSException e) {
-                e.printStackTrace();
+        final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
+
+        executor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Update temperature only if neither system is activated.
+                    if (!Oficina1.this.isColdSystemActivated() && !Oficina1.this.isHeatSystemActivated()) {
+                        // Use the outer instance (Oficina1.this) to update temperature.
+                        Oficina1.this.setTemperature(Utils.manejarTemperaturaRandomIndicator());
+                    }
+                    
+                    int currentTemperature = Oficina1.this.getTemperature();
+                    
+                    // Submit tasks based on conditions, each submitted task runs concurrently.
+                    if (currentTemperature < 15) {
+                        executor.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Oficina1.this.manageColdSystem(jmsComponents.session, jmsComponents.producer);
+                                } catch (JMSException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                    
+                    if (currentTemperature > 30) {
+                        executor.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Oficina1.this.manageHeatSystem(jmsComponents.session, jmsComponents.producer);
+                                } catch (JMSException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                    
+                    // For the regular case, submit the regular temperature message task.
+                    // This task will run concurrently with the others if conditions allow.
+                    executor.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Oficina1.this.sendTemperatureMessage(jmsComponents.session, jmsComponents.producer);
+                            } catch (JMSException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
             }
-        };
-        executor.scheduleAtFixedRate(sendTask, 0, 2, TimeUnit.SECONDS);
+        }, 0, 2, TimeUnit.SECONDS);
     }
+
 
     public void startTemperatureSystem(int temperature) {
         if (temperature < 15) {
