@@ -35,6 +35,9 @@ class ConsolaCentral(stomp.ConnectionListener):
             return temperature_numeric_value, cold_system_activated, heat_system_activated
         except (ValueError, json.JSONDecodeError):
             return None
+        
+    def manage_temperature_system(self):
+        return None
 
     @staticmethod
     def setup_connection():
