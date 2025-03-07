@@ -16,7 +16,7 @@ class ConsolaCentral(stomp.ConnectionListener):
             with latest_temperature_message_lock:
                 latest_temperature_message = frame.body
     
-    def get_latest_temperature_as_int(self):
+    def get_latest_temperature_data(self):
         """
         Retrieves the content of the last received message, interprets it as JSON,
         and extracts the integer value associated with the key "temperature".
@@ -29,7 +29,10 @@ class ConsolaCentral(stomp.ConnectionListener):
         try:
             data = json.loads(received_content)
             temperature = data.get("temperature")
-            return int(temperature) if temperature is not None else None
+            temperature_numeric_value = int(temperature) if temperature is not None else None
+            cold_system_activated = data.get("cold_system_activated")
+            heat_system_activated = data.get("heat_system_activated")
+            return temperature_numeric_value, cold_system_activated, heat_system_activated
         except (ValueError, json.JSONDecodeError):
             return None
 
@@ -62,23 +65,28 @@ def main():
     try:
         while True:
             # Retrieve the content of the last received message (or "N/A" if none)
-            temperature_numeric_value = listener.get_latest_temperature_as_int()
+           temperature_data = listener.get_latest_temperature_data()
+
+           if temperature_data is not None:
+                temperature_numeric_value, cold_system_activated, heat_system_activated = temperature_data
             
-            # Create the JSON payload including the received content
-            json_body = json.dumps({
-                "frio": True,
-                "temperature_numeric_value": temperature_numeric_value
-            })
-            
-            conn.send(
-                destination=actuador_dest, 
-                body=json_body,
-                headers={
-                    "content-type": "application/json", 
-                    "amq-msg-type": "text"
-                }
-            )
-            time.sleep(4)
+                # Create the JSON payload including the received content
+                json_body = json.dumps({
+                    "temperature_numeric_value": temperature_numeric_value,
+                    "cold_system_activated": cold_system_activated,
+                    "heat_system_activated": heat_system_activated
+                })
+                
+                conn.send(
+                    destination=actuador_dest, 
+                    body=json_body,
+                    headers={
+                        "content-type": "application/json", 
+                        "amq-msg-type": "text"
+                    }
+                )
+
+           time.sleep(4)
     except KeyboardInterrupt:
         print("Disconnecting...")
         conn.disconnect()
