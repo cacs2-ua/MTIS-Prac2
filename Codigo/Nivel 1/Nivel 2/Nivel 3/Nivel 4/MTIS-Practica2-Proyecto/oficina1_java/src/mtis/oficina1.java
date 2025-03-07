@@ -15,6 +15,8 @@ import javax.jms.TextMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.json.JSONObject;
+
 
 public class Oficina1 implements MessageListener {
 
@@ -43,7 +45,7 @@ public class Oficina1 implements MessageListener {
     }
     
     /**
-     * Configura la conexion JMS, la sesion, los destinos, el productor y el consumidor.
+     * Configura la conexión JMS, la sesión, los destinos, el productor y el consumidor.
      * Se asigna a este objeto como listener de los mensajes recibidos.
      */
     private JMSComponents setupJMS() throws JMSException {
@@ -52,7 +54,7 @@ public class Oficina1 implements MessageListener {
         
         CountDownLatch latch = new CountDownLatch(1);
         
-        // Crear conexion y sesion
+        // Crear conexión y sesión
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();
@@ -70,12 +72,28 @@ public class Oficina1 implements MessageListener {
         return new JMSComponents(connection, session, producer, consumer);
     }
     
+    private Integer extractTemperature(TextMessage textMessage) {
+        try {
+            String jsonText = textMessage.getText();
+            JSONObject jsonObject = new JSONObject(jsonText);
+            // Check if the "temperature" field exists and is not null
+            if (jsonObject.has("temperature") && !jsonObject.isNull("temperature")) {
+                return jsonObject.getInt("temperature");
+            } else {
+                return null; // temperature is missing or null
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
     /**
      * Actualiza el atributo 'temperature' usando Utils, construye el payload JSON,
-     * crea un TextMessage y lo envï¿½a mediante el productor.
+     * crea un TextMessage y lo envía mediante el productor.
      */
     private void sendTemperatureMessage(Session session, MessageProducer producer) throws JMSException {
-        // Actualizar la temperatura (por ejemplo, usando un mï¿½todo de utilidad)
+        // Actualizar la temperatura (por ejemplo, usando un método de utilidad)
         this.temperature = Utils.manejarTemperaturaRandomIndicator();
         
         // Construir el payload JSON
@@ -92,8 +110,8 @@ public class Oficina1 implements MessageListener {
     }
     
     /**
-     * Inicializa la conexiï¿½n JMS y programa el envï¿½o periï¿½dico de mensajes
-     * utilizando un ScheduledExecutorService para mantener la asincronï¿½a.
+     * Inicializa la conexión JMS y programa el envío periódico de mensajes
+     * utilizando un ScheduledExecutorService para mantener la asincronía.
      */
     public void start() throws JMSException {
         JMSComponents jmsComponents = setupJMS();
@@ -116,6 +134,13 @@ public class Oficina1 implements MessageListener {
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;
                 System.out.println("Received message '" + textMessage.getText() + "'");
+                
+                Integer temperatureValue = extractTemperature(textMessage);
+                if (temperatureValue != null) {
+                    System.out.println("Extracted temperature: " + temperatureValue);
+                } else {
+                    System.out.println("Temperature value is null or not provided.");
+                }
             } else {
                 System.out.println("Received message of type: " + message.getClass().getName());
             }
@@ -123,6 +148,8 @@ public class Oficina1 implements MessageListener {
             System.out.println("Got a JMS Exception!");
         }
     }
+
+
     
     public static void main(String[] args) throws JMSException {
         Oficina1 oficina = new Oficina1();
