@@ -205,7 +205,7 @@ class ConsolaCentral(stomp.ConnectionListener):
         lecturas_illum_dest = "/topic/lecturas_iluminacion_oficina1"
         actuador_illum_dest = "/topic/actuador_iluminacion_oficina1"
         
-        conn.connect(wait=True)
+        conn.connect('mtis', 'mtis', wait=True)
         listener = ConsolaCentral(conn, lecturas_temp_dest, actuador_temp_dest, lecturas_illum_dest, actuador_illum_dest)
         conn.set_listener('', listener)
         conn.subscribe(destination=lecturas_temp_dest, id=1, ack='auto')
