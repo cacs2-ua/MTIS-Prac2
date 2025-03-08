@@ -296,13 +296,7 @@ public class Oficina1 implements MessageListener {
                 String text = textMessage.getText();
                 System.out.println("Received message: " + text);
 
-                JSONObject json = new JSONObject(text);
-                if (json.isNull("temperature")) {
-                    System.out.println("La propiedad 'temperature' es nula.");
-                } else {
-                    int tempValue = json.getInt("temperature");
-                    System.out.println("La temperatura recuperada es: " + tempValue);
-                }
+                manageTemperatureFlags(text);
             } else {
                 System.out.println("Received message of type: " + message.getClass().getName());
             }
