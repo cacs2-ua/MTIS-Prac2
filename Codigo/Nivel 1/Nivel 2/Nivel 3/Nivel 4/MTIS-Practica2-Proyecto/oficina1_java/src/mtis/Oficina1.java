@@ -115,7 +115,7 @@ public class Oficina1 implements MessageListener {
         
         CountDownLatch latch = new CountDownLatch(1);
         
-        // Create connection and session
+        // Create connection and session  
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();
