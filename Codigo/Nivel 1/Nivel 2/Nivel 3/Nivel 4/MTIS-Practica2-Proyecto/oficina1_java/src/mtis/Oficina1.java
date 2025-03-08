@@ -83,7 +83,7 @@ public class Oficina1 implements MessageListener {
     }
     
     /**
-     * Configura la conexi�n JMS, la sesi�n, los destinos, el productor y el consumidor.
+     * Configura la conexi�n JMS, la sesi�n, los destinos, el productor y el consumidor. 
      * Se asigna este objeto como listener del consumidor.
      */
     private JMSComponents setupJMS() throws JMSException {
