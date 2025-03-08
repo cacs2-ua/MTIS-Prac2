@@ -116,9 +116,6 @@ public class Oficina1 implements MessageListener {
     private void sendTemperatureMessage(Session session, MessageProducer producer) throws JMSException {
         // Si ningún sistema está activado se actualiza la temperatura;
         // de lo contrario se conserva el valor modificado por la gestión.
-        if (!this.isColdSystemActivated() && !this.isHeatSystemActivated()) {
-            this.temperature = Utils.manejarTemperaturaRandomIndicator();
-        }
         
         // Construir el payload JSON usando los flags actuales
         String jsonPayload = "{"
@@ -130,6 +127,10 @@ public class Oficina1 implements MessageListener {
         
         // Crear y enviar el TextMessage
         TextMessage message = session.createTextMessage(jsonPayload);
+        
+        int temp = this.temperature;
+        temp = this.temperature;
+        
         producer.send(message);
     }
 
@@ -210,10 +211,10 @@ public class Oficina1 implements MessageListener {
                     int currentTemperature = Oficina1.this.getTemperature();
                     
                     // Según la condición, ejecutar la acción de gestión o enviar el mensaje de lectura
-                    if (currentTemperature < 15) {
+                    if (currentTemperature < 15 || Oficina1.this.isHeatSystemActivated()) {
                         // Gestión del calor (llamada directa para facilitar la depuración)
                         Oficina1.this.manageHeatSystem(jmsComponents.session, jmsComponents.producer);
-                    } else if (currentTemperature > 30) {
+                    } else if (currentTemperature > 30 || Oficina1.this.isColdSystemActivated()) {
                         // Gestión del frío
                         Oficina1.this.manageColdSystem(jmsComponents.session, jmsComponents.producer);
                     } else {
