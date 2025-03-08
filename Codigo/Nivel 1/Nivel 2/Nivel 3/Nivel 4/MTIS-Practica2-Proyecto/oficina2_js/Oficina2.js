@@ -1,264 +1,275 @@
 // Oficina2.js
-// This file replicates the functionality of Oficina1.java in Node.js
-// It communicates with ActiveMQ via STOMP and uses the topics for Office2.
-// To run: node Oficina2.js
-// Make sure to install the dependency: npm install stomp-client
+// Node.js implementation analogous to Oficina1.java using stompit
 
-var StompClient = require('stomp-client');
+const stompit = require('stompit');
+const Utils = require('./Utils');
 
-// Broker settings
-var BROKER_HOST = 'localhost';
-var BROKER_PORT = 61613; // STOMP port
-var USER = 'mtis';
-var PASS = 'mtis';
+const temperatureDifference = 2;
+const heatSystemStopTemperature = 23;
+const coldSystemStopTemperature = 23;
+const illuminationIntensityDifference = 200;
+const increaseIntensityIlluminationRegulatorStopIntensity = 2300;
+const decreaseIntensityIlluminationRegulatorStopIntensity = 2300;
 
-// Topics for Office2
-var LECTURAS_TEMP_TOPIC = '/topic/lecturas_temperaturas_oficina2';
-var ACTUADOR_TEMP_TOPIC = '/topic/actuador_temperatura_oficina2';
-var LECTURAS_ILLUM_TOPIC = '/topic/lecturas_iluminacion_oficina2';
-var ACTUADOR_ILLUM_TOPIC = '/topic/actuador_iluminacion_oficina2';
-
-// Internal state variables
-var temperature = 0;
-var heatSystemActivated = false;
-var coldSystemActivated = false;
-
-var illuminationIntensity = 2300; // equilibrium value
-var increaseIntensityRegulatorActivated = false;
-var decreaseIntensityRegulatorActivated = false;
-
-// Counters to simulate random indicators (to mimic the Java Utils methods)
-var temperaturaRandomIndicator = 0;
-var illuminationRandomIndicator = 0;
-
-// Functions to generate pseudo-random values similar to Utils.java
-function manejarTemperaturaRandomIndicator() {
-    var modulo = temperaturaRandomIndicator % 8;
-    var randomNumber = 0;
-    if (modulo === 0) {
-        randomNumber = Math.floor(Math.random() * 6) + 25;
-    } else if (modulo === 1) {
-        randomNumber = Math.floor(Math.random() * 6) + 20;
-    } else if (modulo === 2) {
-        randomNumber = Math.floor(Math.random() * 6) + 15;
-    } else if (modulo === 3) {
-        randomNumber = Math.floor(Math.random() * 15);
-    } else if (modulo === 4) {
-        randomNumber = Math.floor(Math.random() * 6) + 15;
-    } else if (modulo === 5) {
-        randomNumber = Math.floor(Math.random() * 6) + 20;
-    } else if (modulo === 6) {
-        randomNumber = Math.floor(Math.random() * 6) + 25;
-    } else if (modulo === 7) {
-        randomNumber = Math.floor(Math.random() * 15) + 31;
+class Oficina2 {
+    constructor() {
+        this.temperature = 0; // initial temperature value
+        this.illuminationIntensity = 2300; // initial illumination intensity
+        this.heatSystemActivated = false;
+        this.coldSystemActivated = false;
+        this.increaseIntensityIlluminationRegulatorActivated = false;
+        this.decreaseIntensityIlluminationRegulatorActivated = false;
     }
-    temperaturaRandomIndicator++;
-    return randomNumber;
-}
-
-function manejarIlluminationIntensityRandomIndicator() {
-    var modulo = illuminationRandomIndicator % 12;
-    var randomNumber = 0;
-    if (modulo === 0) {
-        randomNumber = Math.floor(Math.random() * 301) + 1500;
-    } else if (modulo === 1) {
-        randomNumber = Math.floor(Math.random() * 301) + 1800;
-    } else if (modulo === 2) {
-        randomNumber = Math.floor(Math.random() * 301) + 2100;
-    } else if (modulo === 3) {
-        randomNumber = Math.floor(Math.random() * 301) + 2400;
-    } else if (modulo === 4) {
-        randomNumber = Math.floor(Math.random() * 301) + 2700;
-    } else if (modulo === 5) {
-        randomNumber = Math.floor(Math.random() * 1500) + 3001;
-    } else if (modulo === 6) {
-        randomNumber = Math.floor(Math.random() * 301) + 2700;
-    } else if (modulo === 7) {
-        randomNumber = Math.floor(Math.random() * 301) + 2400;
-    } else if (modulo === 8) {
-        randomNumber = Math.floor(Math.random() * 301) + 2100;
-    } else if (modulo === 9) {
-        randomNumber = Math.floor(Math.random() * 301) + 1800;
-    } else if (modulo === 10) {
-        randomNumber = Math.floor(Math.random() * 301) + 1500;
-    } else if (modulo === 11) {
-        randomNumber = Math.floor(Math.random() * 1500);
-    }
-    illuminationRandomIndicator++;
-    return randomNumber;
-}
-
-// Create a STOMP client
-var client = new StompClient(BROKER_HOST, BROKER_PORT, USER, PASS);
-
-// Connect to the broker
-client.connect(function(sessionId) {
-    console.log("Connected with sessionId:", sessionId);
     
-    // Subscribe to actuator topics for Office2
-    client.subscribe(ACTUADOR_TEMP_TOPIC, function(body, headers) {
-        // Parse JSON message
-        try {
-            var data = JSON.parse(body);
-            // Process temperature flags and print received info (for Office2)
-            printReceivedTemperatureInformation(data);
-        } catch (e) {
-            console.log("Error parsing JSON in temperature actuator message:", e);
-        }
-    });
-
-    client.subscribe(ACTUADOR_ILLUM_TOPIC, function(body, headers) {
-        // Parse JSON message
-        try {
-            var data = JSON.parse(body);
-            // Process illumination flags and print received info (for Office2)
-            printReceivedIlluminationInformation(data);
-        } catch (e) {
-            console.log("Error parsing JSON in illumination actuator message:", e);
-        }
-    });
+    incrementTemperature() {
+        this.temperature += temperatureDifference;
+    }
     
-    // Periodic tasks for temperature and illumination (every 2 seconds)
-    setInterval(function() {
-        if (!coldSystemActivated && !heatSystemActivated) {
-            temperature = manejarTemperaturaRandomIndicator();
+    decrementTemperature() {
+        this.temperature -= temperatureDifference;
+    }
+    
+    sendTemperatureMessage(client) {
+        const payload = JSON.stringify({
+            office: "office2",
+            temperature: this.temperature,
+            cold_system_activated: this.coldSystemActivated,
+            heat_system_activated: this.heatSystemActivated
+        });
+        const frame = client.send({destination: '/topic/lecturas_temperaturas_oficina2'});
+        frame.write(payload);
+        frame.end();
+    }
+    
+    manageColdSystem(client) {
+        if (!this.coldSystemActivated) {
+            this.coldSystemActivated = true;
         }
-        if (heatSystemActivated) {
-            manageHeatSystem();
-        } else if (coldSystemActivated) {
-            manageColdSystem();
-        } else {
-            sendTemperatureMessage();
+        this.decrementTemperature();
+        const payload = JSON.stringify({
+            office: "office2",
+            temperature: this.temperature,
+            cold_system_activated: this.coldSystemActivated,
+            heat_system_activated: this.heatSystemActivated
+        });
+        const frame = client.send({destination: '/topic/lecturas_temperaturas_oficina2'});
+        frame.write(payload);
+        frame.end();
+        if (this.temperature <= coldSystemStopTemperature) {
+            this.coldSystemActivated = false;
         }
-        console.log("Office2 Temperature Sensor:", temperature, "C");
-    }, 2000);
-
-    setInterval(function() {
-        if (!increaseIntensityRegulatorActivated && !decreaseIntensityRegulatorActivated) {
-            illuminationIntensity = manejarIlluminationIntensityRandomIndicator();
+    }
+    
+    manageHeatSystem(client) {
+        if (!this.heatSystemActivated) {
+            this.heatSystemActivated = true;
         }
-        if (increaseIntensityRegulatorActivated) {
-            manageIncreaseIlluminationRegulator();
-        } else if (decreaseIntensityRegulatorActivated) {
-            manageDecreaseIlluminationRegulator();
-        } else {
-            sendIlluminationMessage();
+        this.incrementTemperature();
+        const payload = JSON.stringify({
+            office: "office2",
+            temperature: this.temperature,
+            cold_system_activated: this.coldSystemActivated,
+            heat_system_activated: this.heatSystemActivated
+        });
+        const frame = client.send({destination: '/topic/lecturas_temperaturas_oficina2'});
+        frame.write(payload);
+        frame.end();
+        if (this.temperature >= heatSystemStopTemperature) {
+            this.heatSystemActivated = false;
         }
-        console.log("Office2 Illumination Sensor:", illuminationIntensity, "lumens");
-    }, 2000);
-});
-
-// Function to send temperature reading message
-function sendTemperatureMessage() {
-    var message = {
-        office: "office2",
-        temperature: temperature,
-        cold_system_activated: coldSystemActivated,
-        heat_system_activated: heatSystemActivated
-    };
-    client.publish(LECTURAS_TEMP_TOPIC, JSON.stringify(message));
+    }
+    
+    sendIlluminationMessage(client) {
+        const payload = JSON.stringify({
+            office: "office2",
+            illumination_intensity: this.illuminationIntensity,
+            increase_intensity_regulator_activated: this.increaseIntensityIlluminationRegulatorActivated,
+            decrease_intensity_regulator_activated: this.decreaseIntensityIlluminationRegulatorActivated
+        });
+        const frame = client.send({destination: '/topic/lecturas_iluminacion_oficina2'});
+        frame.write(payload);
+        frame.end();
+    }
+    
+    manageIncreaseIlluminationRegulator(client) {
+        if (!this.increaseIntensityIlluminationRegulatorActivated) {
+            this.increaseIntensityIlluminationRegulatorActivated = true;
+        }
+        this.illuminationIntensity += illuminationIntensityDifference;
+        const payload = JSON.stringify({
+            office: "office2",
+            illumination_intensity: this.illuminationIntensity,
+            increase_intensity_regulator_activated: this.increaseIntensityIlluminationRegulatorActivated,
+            decrease_intensity_regulator_activated: this.decreaseIntensityIlluminationRegulatorActivated
+        });
+        const frame = client.send({destination: '/topic/lecturas_iluminacion_oficina2'});
+        frame.write(payload);
+        frame.end();
+        if (this.illuminationIntensity >= increaseIntensityIlluminationRegulatorStopIntensity) {
+            this.increaseIntensityIlluminationRegulatorActivated = false;
+        }
+    }
+    
+    manageDecreaseIlluminationRegulator(client) {
+        if (!this.decreaseIntensityIlluminationRegulatorActivated) {
+            this.decreaseIntensityIlluminationRegulatorActivated = true;
+        }
+        this.illuminationIntensity -= illuminationIntensityDifference;
+        const payload = JSON.stringify({
+            office: "office2",
+            illumination_intensity: this.illuminationIntensity,
+            increase_intensity_regulator_activated: this.increaseIntensityIlluminationRegulatorActivated,
+            decrease_intensity_regulator_activated: this.decreaseIntensityIlluminationRegulatorActivated
+        });
+        const frame = client.send({destination: '/topic/lecturas_iluminacion_oficina2'});
+        frame.write(payload);
+        frame.end();
+        if (this.illuminationIntensity <= decreaseIntensityIlluminationRegulatorStopIntensity) {
+            this.decreaseIntensityIlluminationRegulatorActivated = false;
+        }
+    }
+    
+    printOwnTemperatureInformation() {
+        console.log("Office2 Temperature Sensor: " + this.temperature + "C");
+        if (this.coldSystemActivated) {
+            console.log("Office2 Temperature Activator: Cold System activated.");
+        }
+        if (this.heatSystemActivated) {
+            console.log("Office2 Temperature Activator: Heat System activated.");
+        }
+    }
+    
+    printOwnIlluminationInformation() {
+        console.log("Office2 Illumination Sensor: " + this.illuminationIntensity + " lumens");
+        if (this.increaseIntensityIlluminationRegulatorActivated) {
+            console.log("Office2 Illumination Activator: Increase Intensity Regulator activated.");
+        }
+        if (this.decreaseIntensityIlluminationRegulatorActivated) {
+            console.log("Office2 Illumination Activator: Decrease Intensity Regulator activated.");
+        }
+    }
+    
+    processMessage(message) {
+        try {
+            let data = JSON.parse(message);
+            if (data.temperature !== undefined) {
+                if (data.activate_cold_system) {
+                    this.coldSystemActivated = true;
+                    console.log("Office2 Temperature Activator: Temperature has exceeded 30C. Activating Cold System...");
+                }
+                if (data.stop_cold_system) {
+                    this.coldSystemActivated = false;
+                    console.log("Office2 Temperature Activator: Temperature has reached 23C or less. Stopping Cold System...");
+                }
+                if (data.activate_heat_system) {
+                    this.heatSystemActivated = true;
+                    console.log("Office2 Temperature Activator: Temperature is below 15C. Activating Heat System...");
+                }
+                if (data.stop_heat_system) {
+                    this.heatSystemActivated = false;
+                    console.log("Office2 Temperature Activator: Temperature has reached 23C or more. Stopping Heat System...");
+                }
+            }
+            if (data.illumination_intensity !== undefined) {
+                if (data.activate_increase_intensity_illumination_regulator) {
+                    this.increaseIntensityIlluminationRegulatorActivated = true;
+                    console.log("Office2 Illumination Activator: Illumination intensity is below threshold. Activating Increase Intensity Regulator...");
+                }
+                if (data.stop_increase_intensity_illumination_regulator) {
+                    this.increaseIntensityIlluminationRegulatorActivated = false;
+                    console.log("Office2 Illumination Activator: Illumination intensity has reached desired level. Stopping Increase Intensity Regulator...");
+                }
+                if (data.activate_decrease_intensity_illumination_regulator) {
+                    this.decreaseIntensityIlluminationRegulatorActivated = true;
+                    console.log("Office2 Illumination Activator: Illumination intensity is above threshold. Activating Decrease Intensity Regulator...");
+                }
+                if (data.stop_decrease_intensity_illumination_regulator) {
+                    this.decreaseIntensityIlluminationRegulatorActivated = false;
+                    console.log("Office2 Illumination Activator: Illumination intensity has reached desired level. Stopping Decrease Intensity Regulator...");
+                }
+            }
+        } catch (e) {
+            console.log("Error processing message: " + e);
+        }
+    }
+    
+    start() {
+        const connectOptions = {
+            host: 'localhost',
+            port: 61613,
+            connectHeaders: {
+                host: '/',
+                login: 'mtis',
+                passcode: 'mtis'
+            }
+        };
+        stompit.connect(connectOptions, (error, client) => {
+            if (error) {
+                console.log('Connection error: ' + error.message);
+                return;
+            }
+            console.log("Office2 (Node.js) connected to broker.");
+            
+            // Subscribe to actuador topics for Office2
+            client.subscribe({destination: '/topic/actuador_temperatura_oficina2', ack: 'auto'}, (err, message) => {
+                if (err) {
+                    console.log("Subscribe error (temperature): " + err.message);
+                    return;
+                }
+                message.readString('utf-8', (err, str) => {
+                    if (err) {
+                        console.log("Read error: " + err.message);
+                        return;
+                    }
+                    this.processMessage(str);
+                });
+            });
+            client.subscribe({destination: '/topic/actuador_iluminacion_oficina2', ack: 'auto'}, (err, message) => {
+                if (err) {
+                    console.log("Subscribe error (illumination): " + err.message);
+                    return;
+                }
+                message.readString('utf-8', (err, str) => {
+                    if (err) {
+                        console.log("Read error: " + err.message);
+                        return;
+                    }
+                    this.processMessage(str);
+                });
+            });
+            
+            // Temperature task every 2 seconds
+            setInterval(() => {
+                if (!this.coldSystemActivated && !this.heatSystemActivated) {
+                    this.temperature = Utils.manejarTemperaturaRandomIndicator();
+                }
+                if (this.heatSystemActivated) {
+                    this.manageHeatSystem(client);
+                } else if (this.coldSystemActivated) {
+                    this.manageColdSystem(client);
+                } else {
+                    this.sendTemperatureMessage(client);
+                }
+                this.printOwnTemperatureInformation();
+            }, 2000);
+            
+            // Illumination task every 2 seconds
+            setInterval(() => {
+                if (!this.increaseIntensityIlluminationRegulatorActivated && !this.decreaseIntensityIlluminationRegulatorActivated) {
+                    this.illuminationIntensity = Utils.manejarIlluminationIntensityRandomIndicator();
+                }
+                if (this.increaseIntensityIlluminationRegulatorActivated) {
+                    this.manageIncreaseIlluminationRegulator(client);
+                } else if (this.decreaseIntensityIlluminationRegulatorActivated) {
+                    this.manageDecreaseIlluminationRegulator(client);
+                } else {
+                    this.sendIlluminationMessage(client);
+                }
+                this.printOwnIlluminationInformation();
+            }, 2000);
+        });
+    }
 }
 
-// Function to send illumination reading message
-function sendIlluminationMessage() {
-    var message = {
-        office: "office2",
-        illumination_intensity: illuminationIntensity,
-        increase_intensity_regulator_activated: increaseIntensityRegulatorActivated,
-        decrease_intensity_regulator_activated: decreaseIntensityRegulatorActivated
-    };
-    client.publish(LECTURAS_ILLUM_TOPIC, JSON.stringify(message));
-}
-
-// Functions to manage temperature systems
-function manageHeatSystem() {
-    if (!heatSystemActivated) {
-        heatSystemActivated = true;
-    }
-    temperature += 2; // Increment temperature by difference
-    sendTemperatureMessage();
-    if (temperature >= 23) {
-        heatSystemActivated = false;
-    }
-}
-
-function manageColdSystem() {
-    if (!coldSystemActivated) {
-        coldSystemActivated = true;
-    }
-    temperature -= 2; // Decrement temperature by difference
-    sendTemperatureMessage();
-    if (temperature <= 23) {
-        coldSystemActivated = false;
-    }
-}
-
-// Functions to manage illumination regulators
-function manageIncreaseIlluminationRegulator() {
-    if (!increaseIntensityRegulatorActivated) {
-        increaseIntensityRegulatorActivated = true;
-    }
-    illuminationIntensity += 200;
-    sendIlluminationMessage();
-    if (illuminationIntensity >= 2300) {
-        increaseIntensityRegulatorActivated = false;
-    }
-}
-
-function manageDecreaseIlluminationRegulator() {
-    if (!decreaseIntensityRegulatorActivated) {
-        decreaseIntensityRegulatorActivated = true;
-    }
-    illuminationIntensity -= 200;
-    sendIlluminationMessage();
-    if (illuminationIntensity <= 2300) {
-        decreaseIntensityRegulatorActivated = false;
-    }
-}
-
-// Functions to print received messages (simulate actuator instructions)
-// For temperature (exactly 6 if statements)
-function printReceivedTemperatureInformation(data) {
-    var temp = data.temperature;
-    if (temp > 30 && data.cold_system_activated === false) {
-        console.log("Temperature Activator (Office2): Temperature has exceeded 30C. Activating Cold System...");
-    }
-    if (temp > 23 && data.cold_system_activated === true) {
-        console.log("Temperature Activator (Office2): Cold System is activated.");
-    }
-    if (temp <= 23 && data.cold_system_activated === true) {
-        console.log("Temperature Activator (Office2): Temperature has reached 23C or less. Requesting Office2 to stop Cold System...");
-    }
-    if (temp < 15 && data.heat_system_activated === false) {
-        console.log("Temperature Activator (Office2): Temperature is below 15C. Activating Heat System...");
-    }
-    if (temp < 23 && data.heat_system_activated === true) {
-        console.log("Temperature Activator (Office2): Heat System is activated.");
-    }
-    if (temp >= 23 && data.heat_system_activated === true) {
-        console.log("Temperature Activator (Office2): Temperature has reached 23C or more. Requesting Office2 to stop Heat System...");
-    }
-}
-
-// For illumination (exactly 6 if statements)
-function printReceivedIlluminationInformation(data) {
-    var illum = data.illumination_intensity;
-    if (illum < 1500 && data.increase_intensity_regulator_activated === false) {
-        console.log("Illumination Activator (Office2): Illumination is below threshold (below 1500 lumens). Activating Increase Intensity Regulator...");
-    }
-    if (illum < 2300 && data.increase_intensity_regulator_activated === true) {
-        console.log("Illumination Activator (Office2): Increase Intensity Regulator is activated.");
-    }
-    if (illum >= 2300 && data.increase_intensity_regulator_activated === true) {
-        console.log("Illumination Activator (Office2): Illumination has reached desired level (around 2300 lumens). Requesting Office2 to stop Increase Intensity Regulator...");
-    }
-    if (illum > 3000 && data.decrease_intensity_regulator_activated === false) {
-        console.log("Illumination Activator (Office2): Illumination is above threshold (above 3000 lumens). Activating Decrease Intensity Regulator...");
-    }
-    if (illum > 2300 && data.decrease_intensity_regulator_activated === true) {
-        console.log("Illumination Activator (Office2): Decrease Intensity Regulator is activated.");
-    }
-    if (illum <= 2300 && data.decrease_intensity_regulator_activated === true) {
-        console.log("Illumination Activator (Office2): Illumination has reached desired level (around 2300 lumens). Requesting Office2 to stop Decrease Intensity Regulator...");
-    }
-}
+const office2 = new Oficina2();
+office2.start();
