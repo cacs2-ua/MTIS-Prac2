@@ -114,7 +114,8 @@ public class Oficina1 implements MessageListener {
      * y envía un TextMessage a través del productor.
      */
     private void sendTemperatureMessage(Session session, MessageProducer producer) throws JMSException {
-        // Actualizar la temperatura solo si ningún sistema está activado
+        // Si ningún sistema está activado se actualiza la temperatura;
+        // de lo contrario se conserva el valor modificado por la gestión.
         if (!this.isColdSystemActivated() && !this.isHeatSystemActivated()) {
             this.temperature = Utils.manejarTemperaturaRandomIndicator();
         }
@@ -136,7 +137,7 @@ public class Oficina1 implements MessageListener {
      * Gestiona el sistema de frío: disminuye la temperatura, envía el payload JSON y actualiza el flag.
      */
     public void manageColdSystem(Session session, MessageProducer producer) throws JMSException {
-        // Activar el sistema de frío si no está ya activado
+        // Activar el sistema de frío si aún no está activado
         if (!this.coldSystemActivated) {
             this.setColdSystemActivated(true);
         }
@@ -152,7 +153,7 @@ public class Oficina1 implements MessageListener {
         TextMessage message = session.createTextMessage(jsonPayload);
         producer.send(message);
         
-        // Desactivar el sistema de frío si se cumple la condición de parada
+        // Si se cumple la condición de parada, desactivar el sistema
         if (this.getTemperature() <= COLD_SYSTEM_STOP_TEMPERATURE) {
             this.setColdSystemActivated(false);
         }
@@ -162,7 +163,7 @@ public class Oficina1 implements MessageListener {
      * Gestiona el sistema de calor: aumenta la temperatura, envía el payload JSON y actualiza el flag.
      */
     public void manageHeatSystem(Session session, MessageProducer producer) throws JMSException {
-        // Activar el sistema de calor si no está ya activado
+        // Activar el sistema de calor si aún no está activado
         if (!this.heatSystemActivated) {
             this.setHeatSystemActivated(true);
         }
@@ -178,7 +179,7 @@ public class Oficina1 implements MessageListener {
         TextMessage message = session.createTextMessage(jsonPayload);
         producer.send(message);
         
-        // Desactivar el sistema de calor si se cumple la condición de parada
+        // Si se cumple la condición de parada, desactivar el sistema
         if (this.getTemperature() >= HEAT_SYSTEM_STOP_TEMPERATURE) {
             this.setHeatSystemActivated(false);
         }
@@ -186,6 +187,11 @@ public class Oficina1 implements MessageListener {
     
     /**
      * Inicializa la conexión JMS y programa tareas que se ejecutan concurrentemente según las condiciones.
+     * Se reestructura la lógica para enviar UN SOLO mensaje por ciclo (sin anidar executor.submit),
+     * de modo que el mismo hilo del task programado ejecute directamente la acción correspondiente:
+     * - Si la temperatura es menor que 15 se ejecuta la gestión del calor.
+     * - Si la temperatura es mayor que 30 se ejecuta la gestión del frío.
+     * - En caso contrario se envía solo el mensaje de lectura.
      */
     public void start() throws JMSException {
         final JMSComponents jmsComponents = setupJMS();
@@ -196,51 +202,24 @@ public class Oficina1 implements MessageListener {
             @Override
             public void run() {
                 try {
-                    // Actualizar la temperatura solo si ningún sistema está activado
+                    // Si ningún sistema está activado, actualizar la temperatura de forma aleatoria.
                     if (!Oficina1.this.isColdSystemActivated() && !Oficina1.this.isHeatSystemActivated()) {
                         Oficina1.this.setTemperature(Utils.manejarTemperaturaRandomIndicator());
                     }
                     
                     int currentTemperature = Oficina1.this.getTemperature();
                     
-                    // Ejecutar tareas basadas en condiciones (cada tarea se ejecuta concurrentemente)
+                    // Según la condición, ejecutar la acción de gestión o enviar el mensaje de lectura
                     if (currentTemperature < 15) {
-                        executor.submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Oficina1.this.manageHeatSystem(jmsComponents.session, jmsComponents.producer);
-                                } catch (JMSException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                        // Gestión del calor (llamada directa para facilitar la depuración)
+                        Oficina1.this.manageHeatSystem(jmsComponents.session, jmsComponents.producer);
+                    } else if (currentTemperature > 30) {
+                        // Gestión del frío
+                        Oficina1.this.manageColdSystem(jmsComponents.session, jmsComponents.producer);
+                    } else {
+                        // Mensaje de lectura normal
+                        Oficina1.this.sendTemperatureMessage(jmsComponents.session, jmsComponents.producer);
                     }
-                    
-                    if (currentTemperature > 30) {
-                        executor.submit(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Oficina1.this.manageColdSystem(jmsComponents.session, jmsComponents.producer);
-                                } catch (JMSException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                    }
-                    
-                    // Tarea regular que se ejecuta siempre
-                    executor.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Oficina1.this.sendTemperatureMessage(jmsComponents.session, jmsComponents.producer);
-                            } catch (JMSException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
                     
                 } catch(Exception e) {
                     e.printStackTrace();
