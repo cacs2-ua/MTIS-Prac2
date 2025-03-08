@@ -244,29 +244,34 @@ public class Oficina1 implements MessageListener {
         }
     }
 
-    public void printTemperatureInformation(String text) {
-        if (this.getActivateColdSystemFlag(text) != null && this.getActivateColdSystemFlag(text)) {
-            System.out.println("Temperature activator: Temperature has exceeded 30C. Activating Cold System... ");
-        }
+    public void printOwnTemperatureInformation() {
+        System.out.println("Temperature Sensor: " + this.getTemperature() + "C");
 
         if (this.isColdSystemActivated()) {
-            System.out.println("Temperature activator: Cold System activated. ");
-        }
-
-        if (this.getStopColdSystemFlag(text) != null && this.getStopColdSystemFlag(text)) {
-            System.out.println("Temperature activator: Temperature has reached 23C or less. Stopping Cold System... ");
-        }
-
-        if (this.getActivateHeatSystemFlag(text) != null && this.getActivateHeatSystemFlag(text)) {
-            System.out.println("Temperature activator: Temperature has dropped 15C. Activating Heat System... ");
+            System.out.println("Temperature Activator: Cold System activated. ");
         }
 
         if (this.isHeatSystemActivated()) {
-            System.out.println("Temperature activator: Heat System activated. ");
+            System.out.println("Temperature Activator: Heat System activated. ");
+        }
+    }
+
+    public void printReceivedTemperatureInformation(String text) {
+        if (this.getActivateColdSystemFlag(text) != null && this.getActivateColdSystemFlag(text)) {
+            System.out.println("Temperature Activator: Temperature has exceeded 30C. Activating Cold System... ");
+        }
+
+        if (this.getStopColdSystemFlag(text) != null && this.getStopColdSystemFlag(text)) {
+            System.out.println("Temperature Activator: Temperature has reached 23C or less. Stopping Cold System... ");
+        }
+
+
+        if (this.getActivateHeatSystemFlag(text) != null && this.getActivateHeatSystemFlag(text)) {
+            System.out.println("Temperature Activator: Temperature is below 15C. Activating Heat System... ");
         }
 
         if (this.getStopHeatSystemFlag(text) != null && this.getStopHeatSystemFlag(text)) {
-            System.out.println("Temperature activator: Temperature has reached 23C or more. Stopping Heat System... ");
+            System.out.println("Temperature Activator: Temperature has reached 23C or more. Stopping Heat System... ");
         }
     }
         
@@ -293,9 +298,7 @@ public class Oficina1 implements MessageListener {
                         Oficina1.this.setTemperature(Utils.manejarTemperaturaRandomIndicator());
                     }
                     
-                    int currentTemperature = Oficina1.this.getTemperature();
-                    
-                	System.out.println("Temperature sensor: " + currentTemperature + "C");
+                    Oficina1.this.printOwnTemperatureInformation();
                     
                     // Seg�n la condici�n, ejecutar la acci�n de gesti�n o enviar el mensaje de lectura
                     if (Oficina1.this.isHeatSystemActivated()) {
@@ -323,6 +326,8 @@ public class Oficina1 implements MessageListener {
                 TextMessage textMessage = (TextMessage) message;
                 String text = textMessage.getText();
                 manageTemperatureFlags(text);
+
+                this.printReceivedTemperatureInformation(text);
             } else {
                 System.out.println("Received message of type: " + message.getClass().getName());
             }
