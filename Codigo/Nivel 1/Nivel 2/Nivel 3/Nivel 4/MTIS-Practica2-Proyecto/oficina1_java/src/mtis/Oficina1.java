@@ -15,6 +15,7 @@ import javax.jms.TextMessage;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.json.JSONObject;
 
 public class Oficina1 implements MessageListener {
 
@@ -82,7 +83,7 @@ public class Oficina1 implements MessageListener {
     }
     
     /**
-     * Configura la conexión JMS, la sesión, los destinos, el productor y el consumidor.
+     * Configura la conexiï¿½n JMS, la sesiï¿½n, los destinos, el productor y el consumidor.
      * Se asigna este objeto como listener del consumidor.
      */
     private JMSComponents setupJMS() throws JMSException {
@@ -91,7 +92,7 @@ public class Oficina1 implements MessageListener {
         
         CountDownLatch latch = new CountDownLatch(1);
         
-        // Crear conexión y sesión
+        // Crear conexiï¿½n y sesiï¿½n
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();
@@ -111,11 +112,11 @@ public class Oficina1 implements MessageListener {
     
     /**
      * Actualiza la temperatura utilizando Utils, construye el payload JSON con el estado actual
-     * y envía un TextMessage a través del productor.
+     * y envï¿½a un TextMessage a travï¿½s del productor.
      */
     private void sendTemperatureMessage(Session session, MessageProducer producer) throws JMSException {
-        // Si ningún sistema está activado se actualiza la temperatura;
-        // de lo contrario se conserva el valor modificado por la gestión.
+        // Si ningï¿½n sistema estï¿½ activado se actualiza la temperatura;
+        // de lo contrario se conserva el valor modificado por la gestiï¿½n.
         
         // Construir el payload JSON usando los flags actuales
         String jsonPayload = "{"
@@ -135,10 +136,10 @@ public class Oficina1 implements MessageListener {
     }
 
     /**
-     * Gestiona el sistema de frío: disminuye la temperatura, envía el payload JSON y actualiza el flag.
+     * Gestiona el sistema de frï¿½o: disminuye la temperatura, envï¿½a el payload JSON y actualiza el flag.
      */
     public void manageColdSystem(Session session, MessageProducer producer) throws JMSException {
-        // Activar el sistema de frío si aún no está activado
+        // Activar el sistema de frï¿½o si aï¿½n no estï¿½ activado
         if (!this.coldSystemActivated) {
             this.setColdSystemActivated(true);
         }
@@ -154,17 +155,17 @@ public class Oficina1 implements MessageListener {
         TextMessage message = session.createTextMessage(jsonPayload);
         producer.send(message);
         
-        // Si se cumple la condición de parada, desactivar el sistema
+        // Si se cumple la condiciï¿½n de parada, desactivar el sistema
         if (this.getTemperature() <= COLD_SYSTEM_STOP_TEMPERATURE) {
             this.setColdSystemActivated(false);
         }
     }
 
     /**
-     * Gestiona el sistema de calor: aumenta la temperatura, envía el payload JSON y actualiza el flag.
+     * Gestiona el sistema de calor: aumenta la temperatura, envï¿½a el payload JSON y actualiza el flag.
      */
     public void manageHeatSystem(Session session, MessageProducer producer) throws JMSException {
-        // Activar el sistema de calor si aún no está activado
+        // Activar el sistema de calor si aï¿½n no estï¿½ activado
         if (!this.heatSystemActivated) {
             this.setHeatSystemActivated(true);
         }
@@ -180,19 +181,19 @@ public class Oficina1 implements MessageListener {
         TextMessage message = session.createTextMessage(jsonPayload);
         producer.send(message);
         
-        // Si se cumple la condición de parada, desactivar el sistema
+        // Si se cumple la condiciï¿½n de parada, desactivar el sistema
         if (this.getTemperature() >= HEAT_SYSTEM_STOP_TEMPERATURE) {
             this.setHeatSystemActivated(false);
         }
     }
     
     /**
-     * Inicializa la conexión JMS y programa tareas que se ejecutan concurrentemente según las condiciones.
-     * Se reestructura la lógica para enviar UN SOLO mensaje por ciclo (sin anidar executor.submit),
-     * de modo que el mismo hilo del task programado ejecute directamente la acción correspondiente:
-     * - Si la temperatura es menor que 15 se ejecuta la gestión del calor.
-     * - Si la temperatura es mayor que 30 se ejecuta la gestión del frío.
-     * - En caso contrario se envía solo el mensaje de lectura.
+     * Inicializa la conexiï¿½n JMS y programa tareas que se ejecutan concurrentemente segï¿½n las condiciones.
+     * Se reestructura la lï¿½gica para enviar UN SOLO mensaje por ciclo (sin anidar executor.submit),
+     * de modo que el mismo hilo del task programado ejecute directamente la acciï¿½n correspondiente:
+     * - Si la temperatura es menor que 15 se ejecuta la gestiï¿½n del calor.
+     * - Si la temperatura es mayor que 30 se ejecuta la gestiï¿½n del frï¿½o.
+     * - En caso contrario se envï¿½a solo el mensaje de lectura.
      */
     public void start() throws JMSException {
         final JMSComponents jmsComponents = setupJMS();
@@ -203,19 +204,19 @@ public class Oficina1 implements MessageListener {
             @Override
             public void run() {
                 try {
-                    // Si ningún sistema está activado, actualizar la temperatura de forma aleatoria.
+                    // Si ningï¿½n sistema estï¿½ activado, actualizar la temperatura de forma aleatoria.
                     if (!Oficina1.this.isColdSystemActivated() && !Oficina1.this.isHeatSystemActivated()) {
                         Oficina1.this.setTemperature(Utils.manejarTemperaturaRandomIndicator());
                     }
                     
                     int currentTemperature = Oficina1.this.getTemperature();
                     
-                    // Según la condición, ejecutar la acción de gestión o enviar el mensaje de lectura
-                    if (currentTemperature < 15 || Oficina1.this.isHeatSystemActivated()) {
-                        // Gestión del calor (llamada directa para facilitar la depuración)
+                    // Segï¿½n la condiciï¿½n, ejecutar la acciï¿½n de gestiï¿½n o enviar el mensaje de lectura
+                    if (Oficina1.this.isHeatSystemActivated()) {
+                        // Gestiï¿½n del calor (llamada directa para facilitar la depuraciï¿½n)
                         Oficina1.this.manageHeatSystem(jmsComponents.session, jmsComponents.producer);
-                    } else if (currentTemperature > 30 || Oficina1.this.isColdSystemActivated()) {
-                        // Gestión del frío
+                    } else if (Oficina1.this.isColdSystemActivated()) {
+                        // Gestiï¿½n del frï¿½o
                         Oficina1.this.manageColdSystem(jmsComponents.session, jmsComponents.producer);
                     } else {
                         // Mensaje de lectura normal
@@ -234,7 +235,16 @@ public class Oficina1 implements MessageListener {
         try {
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;
-                System.out.println("Received message '" + textMessage.getText() + "'");
+                String text = textMessage.getText();
+                System.out.println("Received message: " + text);
+
+                JSONObject json = new JSONObject(text);
+                if (json.isNull("temperature")) {
+                    System.out.println("La propiedad 'temperature' es nula.");
+                } else {
+                    int tempValue = json.getInt("temperature");
+                    System.out.println("La temperatura recuperada es: " + tempValue);
+                }
             } else {
                 System.out.println("Received message of type: " + message.getClass().getName());
             }
