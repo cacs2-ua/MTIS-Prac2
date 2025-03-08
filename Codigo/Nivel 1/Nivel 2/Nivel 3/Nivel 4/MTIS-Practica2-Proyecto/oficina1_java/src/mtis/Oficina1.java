@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public class Oficina1 implements MessageListener {
 
-    // Temperature variables
+    // Temperature variables 
     private int temperature;
     private boolean heatSystemActivated = false;
     private boolean coldSystemActivated = false;
