@@ -243,6 +243,32 @@ public class Oficina1 implements MessageListener {
             this.setHeatSystemActivated(false);
         }
     }
+
+    public void printTemperatureInformation(String text) {
+        if (this.getActivateColdSystemFlag(text) != null && this.getActivateColdSystemFlag(text)) {
+            System.out.println("Temperature activator: Temperature has exceeded 30C. Activating Cold System... ");
+        }
+
+        if (this.isColdSystemActivated()) {
+            System.out.println("Temperature activator: Cold System activated. ");
+        }
+
+        if (this.getStopColdSystemFlag(text) != null && this.getStopColdSystemFlag(text)) {
+            System.out.println("Temperature activator: Temperature has reached 23C or less. Stopping Cold System... ");
+        }
+
+        if (this.getActivateHeatSystemFlag(text) != null && this.getActivateHeatSystemFlag(text)) {
+            System.out.println("Temperature activator: Temperature has dropped 15C. Activating Heat System... ");
+        }
+
+        if (this.isHeatSystemActivated()) {
+            System.out.println("Temperature activator: Heat System activated. ");
+        }
+
+        if (this.getStopHeatSystemFlag(text) != null && this.getStopHeatSystemFlag(text)) {
+            System.out.println("Temperature activator: Temperature has reached 23C or more. Stopping Heat System... ");
+        }
+    }
         
     
     /**
@@ -269,6 +295,8 @@ public class Oficina1 implements MessageListener {
                     
                     int currentTemperature = Oficina1.this.getTemperature();
                     
+                	System.out.println("Temperature sensor: " + currentTemperature + "C");
+                    
                     // Seg�n la condici�n, ejecutar la acci�n de gesti�n o enviar el mensaje de lectura
                     if (Oficina1.this.isHeatSystemActivated()) {
                         // Gesti�n del calor (llamada directa para facilitar la depuraci�n)
@@ -294,8 +322,6 @@ public class Oficina1 implements MessageListener {
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;
                 String text = textMessage.getText();
-                System.out.println("Received message: " + text);
-
                 manageTemperatureFlags(text);
             } else {
                 System.out.println("Received message of type: " + message.getClass().getName());
