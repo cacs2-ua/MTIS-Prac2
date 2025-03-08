@@ -22,12 +22,20 @@ public class Oficina1 implements MessageListener {
     // Atributo para almacenar la temperatura 
     private int temperature;
     
-    private boolean coldSystemActivated = false;
+
     private boolean heatSystemActivated = false;
+    private boolean coldSystemActivated = false;
+    
+    private boolean increaseIntensityIlluminationRegulatorActivated = false;
+    private boolean decreaseIntensityIlluminationRegulatorActivated = false;
 
     public static final int TEMPERATURE_DIFFERENCE = 2;
-    public static final int COLD_SYSTEM_STOP_TEMPERATURE = 23;
     public static final int HEAT_SYSTEM_STOP_TEMPERATURE = 23;
+    public static final int COLD_SYSTEM_STOP_TEMPERATURE = 23;
+    
+    public static final int ILLUMINATION_INTENSITY_DIFFERENCE = 200;
+    public static final int INCREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY = 2300;
+    public static final int DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY = 2300;
 
     public int getTemperature() {
         return temperature;
@@ -87,7 +95,7 @@ public class Oficina1 implements MessageListener {
      * Se asigna este objeto como listener del consumidor.
      */
     private JMSComponents setupJMS() throws JMSException {
-        System.out.println("ComienzOOOo");
+        System.out.println("Office1 Starting... ");
         String url = "tcp://localhost:61616";
         
         CountDownLatch latch = new CountDownLatch(1);
