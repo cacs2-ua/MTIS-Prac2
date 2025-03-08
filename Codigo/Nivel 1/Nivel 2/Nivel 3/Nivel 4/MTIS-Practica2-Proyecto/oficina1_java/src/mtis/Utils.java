@@ -41,7 +41,7 @@ public final class Utils {
         return randomNumber;
     }
 
-    public static int manejarilluminationIntensityRandomIndicator () {
+    public static int manejarIlluminationIntensityRandomIndicator () {
         Random random = new Random();
         int indicadorModulo = illuminationIntensityRandomIndicator  % 12;
         int randomNumber = 0;

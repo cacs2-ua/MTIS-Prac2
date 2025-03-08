@@ -19,13 +19,13 @@ import org.json.JSONObject;
 
 public class Oficina1 implements MessageListener {
 
-    // Atributo para almacenar la temperatura 
+    // Temperature variables
     private int temperature;
-    
-
     private boolean heatSystemActivated = false;
     private boolean coldSystemActivated = false;
     
+    // Illumination variables
+    private int illuminationIntensity;
     private boolean increaseIntensityIlluminationRegulatorActivated = false;
     private boolean decreaseIntensityIlluminationRegulatorActivated = false;
 
@@ -36,6 +36,12 @@ public class Oficina1 implements MessageListener {
     public static final int ILLUMINATION_INTENSITY_DIFFERENCE = 200;
     public static final int INCREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY = 2300;
     public static final int DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY = 2300;
+
+    // Constructor: initialize temperature and illumination intensity
+    public Oficina1() {
+        this.temperature = 0; // initial temperature value
+        this.illuminationIntensity = 2300; // initial illumination intensity (equilibrium)
+    }
 
     public int getTemperature() {
         return temperature;
@@ -60,6 +66,14 @@ public class Oficina1 implements MessageListener {
     public void setHeatSystemActivated(boolean heatSystemActivated) {
         this.heatSystemActivated = heatSystemActivated;
     }
+    
+    public int getIlluminationIntensity() {
+        return illuminationIntensity;
+    }
+    
+    public void setIlluminationIntensity(int illuminationIntensity) {
+        this.illuminationIntensity = illuminationIntensity;
+    }
 
     public void incrementTemperature() {
         this.temperature += TEMPERATURE_DIFFERENCE;
@@ -69,30 +83,31 @@ public class Oficina1 implements MessageListener {
         this.temperature -= TEMPERATURE_DIFFERENCE;
     }
 
-    public Oficina1() {
-        this.temperature = 0; // Valor inicial
-    }
-
     /**
-     * Clase interna auxiliar para almacenar los componentes JMS.
+     * Internal class to hold JMS components for both temperature and illumination.
      */
     private static class JMSComponents {
         public Connection connection;
         public Session session;
-        public MessageProducer producer;
-        public MessageConsumer consumer;
+        public MessageProducer temperatureProducer;
+        public MessageConsumer temperatureConsumer;
+        public MessageProducer illuminationProducer;
+        public MessageConsumer illuminationConsumer;
         
-        public JMSComponents(Connection connection, Session session, MessageProducer producer, MessageConsumer consumer) {
+        public JMSComponents(Connection connection, Session session,
+                             MessageProducer temperatureProducer, MessageConsumer temperatureConsumer,
+                             MessageProducer illuminationProducer, MessageConsumer illuminationConsumer) {
             this.connection = connection;
             this.session = session;
-            this.producer = producer;
-            this.consumer = consumer;
+            this.temperatureProducer = temperatureProducer;
+            this.temperatureConsumer = temperatureConsumer;
+            this.illuminationProducer = illuminationProducer;
+            this.illuminationConsumer = illuminationConsumer;
         }
     }
     
     /**
-     * Configura la conexi�n JMS, la sesi�n, los destinos, el productor y el consumidor. 
-     * Se asigna este objeto como listener del consumidor.
+     * Setup JMS connection, session, and destinations for both temperature and illumination.
      */
     private JMSComponents setupJMS() throws JMSException {
         System.out.println("Office1 Starting... ");
@@ -100,54 +115,51 @@ public class Oficina1 implements MessageListener {
         
         CountDownLatch latch = new CountDownLatch(1);
         
-        // Crear conexi�n y sesi�n
+        // Create connection and session
         ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
         Connection connection = connectionFactory.createConnection();
         connection.start();
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         
-        // Crear destinos
-        Destination lecturasDest = session.createTopic("lecturas_temperaturas_oficina1");
-        Destination actuadorDest = session.createTopic("actuador_temperatura_oficina1");
+        // Create destinations for temperature
+        Destination lecturasTempDest = session.createTopic("lecturas_temperaturas_oficina1");
+        Destination actuadorTempDest = session.createTopic("actuador_temperatura_oficina1");
         
-        // Crear productor y consumidor
-        MessageProducer producer = session.createProducer(lecturasDest);
-        MessageConsumer consumer = session.createConsumer(actuadorDest);
-        consumer.setMessageListener(this);
+        // Create destinations for illumination
+        Destination lecturasIllumDest = session.createTopic("lecturas_iluminacion_oficina1");
+        Destination actuadorIllumDest = session.createTopic("actuador_iluminacion_oficina1");
         
-        return new JMSComponents(connection, session, producer, consumer);
+        // Create producer and consumer for temperature
+        MessageProducer temperatureProducer = session.createProducer(lecturasTempDest);
+        MessageConsumer temperatureConsumer = session.createConsumer(actuadorTempDest);
+        temperatureConsumer.setMessageListener(this);
+        
+        // Create producer and consumer for illumination
+        MessageProducer illuminationProducer = session.createProducer(lecturasIllumDest);
+        MessageConsumer illuminationConsumer = session.createConsumer(actuadorIllumDest);
+        illuminationConsumer.setMessageListener(this);
+        
+        return new JMSComponents(connection, session, temperatureProducer, temperatureConsumer, illuminationProducer, illuminationConsumer);
     }
     
     /**
-     * Actualiza la temperatura utilizando Utils, construye el payload JSON con el estado actual
-     * y env�a un TextMessage a trav�s del productor.
+     * Sends a temperature reading message.
      */
     private void sendTemperatureMessage(Session session, MessageProducer producer) throws JMSException {
-        // Si ning�n sistema est� activado se actualiza la temperatura;
-        // de lo contrario se conserva el valor modificado por la gesti�n.
-        
-        // Construir el payload JSON usando los flags actuales
         String jsonPayload = "{"
                 + "\"office\": \"office1\","
                 + "\"temperature\": " + this.temperature + ","
                 + "\"cold_system_activated\": " + this.coldSystemActivated + ","
                 + "\"heat_system_activated\": " + this.heatSystemActivated
                 + "}";
-        
-        // Crear y enviar el TextMessage
         TextMessage message = session.createTextMessage(jsonPayload);
-        
-        int temp = this.temperature;
-        temp = this.temperature;
-        
         producer.send(message);
     }
 
     /**
-     * Gestiona el sistema de fr�o: disminuye la temperatura, env�a el payload JSON y actualiza el flag.
+     * Manages the cold system: decrements temperature, sends message, and deactivates if condition met.
      */
     public void manageColdSystem(Session session, MessageProducer producer) throws JMSException {
-        // Activar el sistema de fr�o si a�n no est� activado
         if (!this.coldSystemActivated) {
             this.setColdSystemActivated(true);
         }
@@ -163,17 +175,15 @@ public class Oficina1 implements MessageListener {
         TextMessage message = session.createTextMessage(jsonPayload);
         producer.send(message);
         
-        // Si se cumple la condici�n de parada, desactivar el sistema
         if (this.getTemperature() <= COLD_SYSTEM_STOP_TEMPERATURE) {
             this.setColdSystemActivated(false);
         }
     }
 
     /**
-     * Gestiona el sistema de calor: aumenta la temperatura, env�a el payload JSON y actualiza el flag.
+     * Manages the heat system: increments temperature, sends message, and deactivates if condition met.
      */
     public void manageHeatSystem(Session session, MessageProducer producer) throws JMSException {
-        // Activar el sistema de calor si a�n no est� activado
         if (!this.heatSystemActivated) {
             this.setHeatSystemActivated(true);
         }
@@ -189,12 +199,12 @@ public class Oficina1 implements MessageListener {
         TextMessage message = session.createTextMessage(jsonPayload);
         producer.send(message);
         
-        // Si se cumple la condici�n de parada, desactivar el sistema
         if (this.getTemperature() >= HEAT_SYSTEM_STOP_TEMPERATURE) {
             this.setHeatSystemActivated(false);
         }
     }
 
+    // Temperature flag management methods (unchanged)
     public Boolean getActivateColdSystemFlag(String text) {
         JSONObject json = new JSONObject(text);
         if (json.isNull("activate_cold_system")) {
@@ -254,93 +264,239 @@ public class Oficina1 implements MessageListener {
 
     public void printOwnTemperatureInformation() {
         System.out.println("Temperature Sensor: " + this.getTemperature() + "C");
-
         if (this.isColdSystemActivated()) {
-            System.out.println("Temperature Activator: Cold System activated. ");
+            System.out.println("Temperature Activator: Cold System activated.");
         }
-
         if (this.isHeatSystemActivated()) {
-            System.out.println("Temperature Activator: Heat System activated. ");
+            System.out.println("Temperature Activator: Heat System activated.");
         }
     }
 
-    public void printReceivedTemperatureInformation(String text) {
-        if (this.getActivateColdSystemFlag(text) != null && this.getActivateColdSystemFlag(text)) {
-            System.out.println("Temperature Activator: Temperature has exceeded 30C. Activating Cold System... ");
-        }
+    // New methods for illumination
 
-        if (this.getStopColdSystemFlag(text) != null && this.getStopColdSystemFlag(text)) {
-            System.out.println("Temperature Activator: Temperature has reached 23C or less. Stopping Cold System... ");
-        }
-
-
-        if (this.getActivateHeatSystemFlag(text) != null && this.getActivateHeatSystemFlag(text)) {
-            System.out.println("Temperature Activator: Temperature is below 15C. Activating Heat System... ");
-        }
-
-        if (this.getStopHeatSystemFlag(text) != null && this.getStopHeatSystemFlag(text)) {
-            System.out.println("Temperature Activator: Temperature has reached 23C or more. Stopping Heat System... ");
-        }
+    private void sendIlluminationMessage(Session session, MessageProducer producer) throws JMSException {
+        String jsonPayload = "{"
+                + "\"office\": \"office1\","
+                + "\"illumination_intensity\": " + this.illuminationIntensity + ","
+                + "\"increase_intensity_regulator_activated\": " + this.increaseIntensityIlluminationRegulatorActivated + ","
+                + "\"decrease_intensity_regulator_activated\": " + this.decreaseIntensityIlluminationRegulatorActivated
+                + "}";
+        TextMessage message = session.createTextMessage(jsonPayload);
+        producer.send(message);
     }
+
+    public void manageIncreaseIlluminationRegulator(Session session, MessageProducer producer) throws JMSException {
+        if (!this.increaseIntensityIlluminationRegulatorActivated) {
+            this.increaseIntensityIlluminationRegulatorActivated = true;
+        }
+        this.illuminationIntensity += ILLUMINATION_INTENSITY_DIFFERENCE;
         
+        String jsonPayload = "{"
+                + "\"office\": \"office1\","
+                + "\"illumination_intensity\": " + this.illuminationIntensity + ","
+                + "\"increase_intensity_regulator_activated\": " + this.increaseIntensityIlluminationRegulatorActivated + ","
+                + "\"decrease_intensity_regulator_activated\": " + this.decreaseIntensityIlluminationRegulatorActivated
+                + "}";
+        TextMessage message = session.createTextMessage(jsonPayload);
+        producer.send(message);
+        
+        if (this.illuminationIntensity >= INCREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY) {
+            this.increaseIntensityIlluminationRegulatorActivated = false;
+        }
+    }
+
+    public void manageDecreaseIlluminationRegulator(Session session, MessageProducer producer) throws JMSException {
+        if (!this.decreaseIntensityIlluminationRegulatorActivated) {
+            this.decreaseIntensityIlluminationRegulatorActivated = true;
+        }
+        this.illuminationIntensity -= ILLUMINATION_INTENSITY_DIFFERENCE;
+        
+        String jsonPayload = "{"
+                + "\"office\": \"office1\","
+                + "\"illumination_intensity\": " + this.illuminationIntensity + ","
+                + "\"increase_intensity_regulator_activated\": " + this.increaseIntensityIlluminationRegulatorActivated + ","
+                + "\"decrease_intensity_regulator_activated\": " + this.decreaseIntensityIlluminationRegulatorActivated
+                + "}";
+        TextMessage message = session.createTextMessage(jsonPayload);
+        producer.send(message);
+        
+        if (this.illuminationIntensity <= DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY) {
+            this.decreaseIntensityIlluminationRegulatorActivated = false;
+        }
+    }
+
+    public Boolean getActivateIncreaseIntensityFlag(String text) {
+        JSONObject json = new JSONObject(text);
+        if (json.isNull("activate_increase_intensity_illumination_regulator")) {
+            return null;
+        } else {
+            return json.getBoolean("activate_increase_intensity_illumination_regulator");
+        }
+    }
+
+    public Boolean getStopIncreaseIntensityFlag(String text) {
+        JSONObject json = new JSONObject(text);
+        if (json.isNull("stop_increase_intensity_illumination_regulator")) {
+            return null;
+        } else {
+            return json.getBoolean("stop_increase_intensity_illumination_regulator");
+        }
+    }
+
+    public Boolean getActivateDecreaseIntensityFlag(String text) {
+        JSONObject json = new JSONObject(text);
+        if (json.isNull("activate_decrease_intensity_illumination_regulator")) {
+            return null;
+        } else {
+            return json.getBoolean("activate_decrease_intensity_illumination_regulator");
+        }
+    }
+
+    public Boolean getStopDecreaseIntensityFlag(String text) {
+        JSONObject json = new JSONObject(text);
+        if (json.isNull("stop_decrease_intensity_illumination_regulator")) {
+            return null;
+        } else {
+            return json.getBoolean("stop_decrease_intensity_illumination_regulator");
+        }
+    }
+
+    public void manageIlluminationFlags(String text) {
+        Boolean activateIncrease = getActivateIncreaseIntensityFlag(text);
+        Boolean stopIncrease = getStopIncreaseIntensityFlag(text);
+        Boolean activateDecrease = getActivateDecreaseIntensityFlag(text);
+        Boolean stopDecrease = getStopDecreaseIntensityFlag(text);
+
+        if (activateIncrease != null && activateIncrease) {
+            this.increaseIntensityIlluminationRegulatorActivated = true;
+        }
+        if (stopIncrease != null && stopIncrease) {
+            this.increaseIntensityIlluminationRegulatorActivated = false;
+        }
+        if (activateDecrease != null && activateDecrease) {
+            this.decreaseIntensityIlluminationRegulatorActivated = true;
+        }
+        if (stopDecrease != null && stopDecrease) {
+            this.decreaseIntensityIlluminationRegulatorActivated = false;
+        }
+    }
+
+    public void printOwnIlluminationInformation() {
+        System.out.println("Illumination Sensor: " + this.getIlluminationIntensity() + " lumens");
+        if (this.increaseIntensityIlluminationRegulatorActivated) {
+            System.out.println("Illumination Activator: Increase Regulator activated.");
+        }
+        if (this.decreaseIntensityIlluminationRegulatorActivated) {
+            System.out.println("Illumination Activator: Decrease Regulator activated.");
+        }
+    }
+
+    public void printReceivedIlluminationInformation(String text) {
+        if (getActivateIncreaseIntensityFlag(text) != null && getActivateIncreaseIntensityFlag(text)) {
+            System.out.println("Illumination Activator: Illumination intensity is below threshold. Activating Increase Regulator...");
+        }
+        if (getStopIncreaseIntensityFlag(text) != null && getStopIncreaseIntensityFlag(text)) {
+            System.out.println("Illumination Activator: Illumination intensity has reached desired level. Stopping Increase Regulator...");
+        }
+        if (getActivateDecreaseIntensityFlag(text) != null && getActivateDecreaseIntensityFlag(text)) {
+            System.out.println("Illumination Activator: Illumination intensity is above threshold. Activating Decrease Regulator...");
+        }
+        if (getStopDecreaseIntensityFlag(text) != null && getStopDecreaseIntensityFlag(text)) {
+            System.out.println("Illumination Activator: Illumination intensity has reached desired level. Stopping Decrease Regulator...");
+        }
+    }
     
     /**
-     * Inicializa la conexi�n JMS y programa tareas que se ejecutan concurrentemente seg�n las condiciones.
-     * Se reestructura la l�gica para enviar UN SOLO mensaje por ciclo (sin anidar executor.submit),
-     * de modo que el mismo hilo del task programado ejecute directamente la acci�n correspondiente:
-     * - Si la temperatura es menor que 15 se ejecuta la gesti�n del calor.
-     * - Si la temperatura es mayor que 30 se ejecuta la gesti�n del fr�o.
-     * - En caso contrario se env�a solo el mensaje de lectura.
+     * Modified onMessage to process both temperature and illumination messages.
      */
-    public void start() throws JMSException {
-        final JMSComponents jmsComponents = setupJMS();
-        
-        final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
-        
-        executor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // Si ning�n sistema est� activado, actualizar la temperatura de forma aleatoria.
-                    if (!Oficina1.this.isColdSystemActivated() && !Oficina1.this.isHeatSystemActivated()) {
-                        Oficina1.this.setTemperature(Utils.manejarTemperaturaRandomIndicator());
-                    }
-                    
-                    // Seg�n la condici�n, ejecutar la acci�n de gesti�n o enviar el mensaje de lectura
-                    if (Oficina1.this.isHeatSystemActivated()) {
-                        // Gesti�n del calor (llamada directa para facilitar la depuraci�n)
-                        Oficina1.this.manageHeatSystem(jmsComponents.session, jmsComponents.producer);
-                    } else if (Oficina1.this.isColdSystemActivated()) {
-                        // Gesti�n del fr�o
-                        Oficina1.this.manageColdSystem(jmsComponents.session, jmsComponents.producer);
-                    } else {
-                        // Mensaje de lectura normal
-                        Oficina1.this.sendTemperatureMessage(jmsComponents.session, jmsComponents.producer);
-                    }
-                    
-                    Oficina1.this.printOwnTemperatureInformation();
-                    
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }, 0, 2, TimeUnit.SECONDS);
-    }
-
     @Override
     public void onMessage(Message message) {
         try {
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;
                 String text = textMessage.getText();
-                manageTemperatureFlags(text);
-
-                this.printReceivedTemperatureInformation(text);
+                JSONObject json = new JSONObject(text);
+                if (json.has("temperature")) {
+                    manageTemperatureFlags(text);
+                    printReceivedTemperatureInformation(text);
+                }
+                if (json.has("illumination_intensity")) {
+                    manageIlluminationFlags(text);
+                    printReceivedIlluminationInformation(text);
+                }
             } else {
                 System.out.println("Received message of type: " + message.getClass().getName());
             }
         } catch (JMSException e) {
             System.out.println("Got a JMS Exception!");
+        }
+    }
+    
+    /**
+     * The start method now schedules two tasks: one for temperature and one for illumination.
+     */
+    public void start() throws JMSException {
+        final JMSComponents jmsComponents = setupJMS();
+        
+        final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
+        
+        // Temperature task
+        executor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (!Oficina1.this.isColdSystemActivated() && !Oficina1.this.isHeatSystemActivated()) {
+                        Oficina1.this.setTemperature(Utils.manejarTemperaturaRandomIndicator());
+                    }
+                    if (Oficina1.this.isHeatSystemActivated()) {
+                        Oficina1.this.manageHeatSystem(jmsComponents.session, jmsComponents.temperatureProducer);
+                    } else if (Oficina1.this.isColdSystemActivated()) {
+                        Oficina1.this.manageColdSystem(jmsComponents.session, jmsComponents.temperatureProducer);
+                    } else {
+                        Oficina1.this.sendTemperatureMessage(jmsComponents.session, jmsComponents.temperatureProducer);
+                    }
+                    Oficina1.this.printOwnTemperatureInformation();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 0, 2, TimeUnit.SECONDS);
+        
+        // Illumination task
+        executor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (!Oficina1.this.increaseIntensityIlluminationRegulatorActivated && !Oficina1.this.decreaseIntensityIlluminationRegulatorActivated) {
+                        Oficina1.this.setIlluminationIntensity(Utils.manejarIlluminationIntensityRandomIndicator());
+                    }
+                    if (Oficina1.this.increaseIntensityIlluminationRegulatorActivated) {
+                        Oficina1.this.manageIncreaseIlluminationRegulator(jmsComponents.session, jmsComponents.illuminationProducer);
+                    } else if (Oficina1.this.decreaseIntensityIlluminationRegulatorActivated) {
+                        Oficina1.this.manageDecreaseIlluminationRegulator(jmsComponents.session, jmsComponents.illuminationProducer);
+                    } else {
+                        Oficina1.this.sendIlluminationMessage(jmsComponents.session, jmsComponents.illuminationProducer);
+                    }
+                    Oficina1.this.printOwnIlluminationInformation();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 0, 2, TimeUnit.SECONDS);
+    }
+    
+    public void printReceivedTemperatureInformation(String text) {
+        if (this.getActivateColdSystemFlag(text) != null && this.getActivateColdSystemFlag(text)) {
+            System.out.println("Temperature Activator: Temperature has exceeded 30C. Activating Cold System...");
+        }
+        if (this.getStopColdSystemFlag(text) != null && this.getStopColdSystemFlag(text)) {
+            System.out.println("Temperature Activator: Temperature has reached 23C or less. Stopping Cold System...");
+        }
+        if (this.getActivateHeatSystemFlag(text) != null && this.getActivateHeatSystemFlag(text)) {
+            System.out.println("Temperature Activator: Temperature is below 15C. Activating Heat System...");
+        }
+        if (this.getStopHeatSystemFlag(text) != null && this.getStopHeatSystemFlag(text)) {
+            System.out.println("Temperature Activator: Temperature has reached 23C or more. Stopping Heat System...");
         }
     }
     
