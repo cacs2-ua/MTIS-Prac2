@@ -186,6 +186,64 @@ public class Oficina1 implements MessageListener {
             this.setHeatSystemActivated(false);
         }
     }
+
+    public Boolean getActivateColdSystemFlag(String text) {
+        JSONObject json = new JSONObject(text);
+        if (json.isNull("activate_cold_system")) {
+            return null;
+        }
+        else {
+            return json.getBoolean("activate_cold_system");
+        }
+    }
+
+    public Boolean getStopColdSystemFlag(String text) {
+        JSONObject json = new JSONObject(text);
+        if (json.isNull("stop_cold_system")) {
+            return null;
+        } else {
+            return json.getBoolean("stop_cold_system");
+        }
+    }
+
+    public Boolean getActivateHeatSystemFlag(String text) {
+        JSONObject json = new JSONObject(text);
+        if (json.isNull("activate_heat_system")) {
+            return null;
+        } else {
+            return json.getBoolean("activate_heat_system");
+        }
+    }
+
+    public Boolean getStopHeatSystemFlag(String text) {
+        JSONObject json = new JSONObject(text);
+        if (json.isNull("stop_heat_system")) {
+            return null;
+        } else {
+            return json.getBoolean("stop_heat_system");
+        }
+    }
+
+    public void manageTemperatureFlags(String text) {
+        Boolean activateColdSystem = getActivateColdSystemFlag(text);
+        Boolean stopColdSystem = getStopColdSystemFlag(text);
+        Boolean activateHeatSystem = getActivateHeatSystemFlag(text);
+        Boolean stopHeatSystem = getStopHeatSystemFlag(text);
+
+        if (activateColdSystem != null && activateColdSystem) {
+            this.setColdSystemActivated(true);
+        }
+        if (stopColdSystem != null && stopColdSystem) {
+            this.setColdSystemActivated(false);
+        }
+        if (activateHeatSystem != null && activateHeatSystem) {
+            this.setHeatSystemActivated(true);
+        }
+        if (stopHeatSystem != null && stopHeatSystem) {
+            this.setHeatSystemActivated(false);
+        }
+    }
+        
     
     /**
      * Inicializa la conexi�n JMS y programa tareas que se ejecutan concurrentemente seg�n las condiciones.
