@@ -384,25 +384,25 @@ public class Oficina1 implements MessageListener {
     public void printOwnIlluminationInformation() {
         System.out.println("Illumination Sensor: " + this.getIlluminationIntensity() + " lumens");
         if (this.increaseIntensityIlluminationRegulatorActivated) {
-            System.out.println("Illumination Activator: Increase Regulator activated.");
+            System.out.println("Illumination Activator: Increase Intensity Regulator activated.");
         }
         if (this.decreaseIntensityIlluminationRegulatorActivated) {
-            System.out.println("Illumination Activator: Decrease Regulator activated.");
+            System.out.println("Illumination Activator: Decrease Intensity Regulator activated.");
         }
     }
 
     public void printReceivedIlluminationInformation(String text) {
         if (getActivateIncreaseIntensityFlag(text) != null && getActivateIncreaseIntensityFlag(text)) {
-            System.out.println("Illumination Activator: Illumination intensity is below threshold. Activating Increase Regulator...");
+            System.out.println("Illumination Activator: Illumination intensity is below threshold (below 1500 lumens). Activating Increase Intensity Regulator...");
         }
         if (getStopIncreaseIntensityFlag(text) != null && getStopIncreaseIntensityFlag(text)) {
-            System.out.println("Illumination Activator: Illumination intensity has reached desired level. Stopping Increase Regulator...");
+            System.out.println("Illumination Activator: Illumination intensity has reached desired level (around 2300 lumens). Stopping Increase Intensity Regulator...");
         }
         if (getActivateDecreaseIntensityFlag(text) != null && getActivateDecreaseIntensityFlag(text)) {
-            System.out.println("Illumination Activator: Illumination intensity is above threshold. Activating Decrease Regulator...");
+            System.out.println("Illumination Activator: Illumination intensity is above threshold (above 3000 lumens). Activating Decrease Intensity Regulator...");
         }
         if (getStopDecreaseIntensityFlag(text) != null && getStopDecreaseIntensityFlag(text)) {
-            System.out.println("Illumination Activator: Illumination intensity has reached desired level. Stopping Decrease Regulator...");
+            System.out.println("Illumination Activator: Illumination intensity has reached desired level (around 2300 lumens). Stopping Decrease Intensity Regulator...");
         }
     }
     

@@ -47,18 +47,18 @@ class ConsolaCentral(stomp.ConnectionListener):
         temperature = self.getTemperatureFromMessage(data)
         print(f"Office 1 temperature: {temperature}°C")
         if (temperature > self.COLD_SYSTEM_ACTIVATION_TEMPERATURE and not self.getColdSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 has exceeded 30C. Requesting Office1 to activate Cold System...")
+            print("Temperature in Office1 has exceeded 30ºC. Requesting Office1 to activate Cold System...")
         if (temperature > self.COLD_SYSTEM_STOP_TEMPERATURE and self.getColdSystemActivatedFlagFromMessage(data)):
             print("Cold System is activated in Office1.")
         if (temperature <= self.COLD_SYSTEM_STOP_TEMPERATURE and self.getColdSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 has reached 23C or less. Requesting Office1 to stop Cold System...")
+            print("Temperature in Office1 has reached 23ºC or less. Requesting Office1 to stop Cold System...")
        
         if (temperature < self.HEAT_SYSTEM_ACTIVATION_TEMPERATURE and not self.getHeatSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 is below 15C. Requesting Office1 to activate Heat System...")
+            print("Temperature in Office1 is below 15ºC. Requesting Office1 to activate Heat System...")
         if (temperature < self.HEAT_SYSTEM_STOP_TEMPERATURE and self.getHeatSystemActivatedFlagFromMessage(data)):
             print("Heat System is activated in Office1.")
         if (temperature >= self.HEAT_SYSTEM_STOP_TEMPERATURE and self.getHeatSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 has reached 23C or more. Requesting Office1 to stop Heat System...")
+            print("Temperature in Office1 has reached 23ºC or more. Requesting Office1 to stop Heat System...")
 
     def printOffice1IlluminationInformation(self, data):
         illumination = self.getIlluminationIntensityFromMessage(data)
@@ -66,23 +66,23 @@ class ConsolaCentral(stomp.ConnectionListener):
         # Increase regulator conditions (activation and deactivation)
         if (illumination < self.INCREASE_INTENSITY_ILLUMINATION_REGULATOR_ACTIVATION_INTENSITY and 
             not self.getIncreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Illumination in Office1 is below threshold. Requesting Office1 to activate Increase Intensity Regulator...")
+            print("Illumination in Office1 is below threshold (below 1500 lumens). Requesting Office1 to activate Increase Intensity Regulator...")
         if (illumination < self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and 
             self.getIncreaseIntensityRegulatorActivatedFlagFromMessage(data)):
             print("Increase Intensity Regulator is activated in Office1.")
         if (illumination >= self.INCREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and 
             self.getIncreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Illumination in Office1 has reached desired level. Requesting Office1 to stop Increase Intensity Regulator...")
+            print("Illumination in Office1 has reached desired level (around 2300 lumens). Requesting Office1 to stop Increase Intensity Regulator...")
         # Decrease regulator conditions (activation and deactivation)
         if (illumination > self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_ACTIVATION_INTENSITY and 
             not self.getDecreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Illumination in Office1 is above threshold. Requesting Office1 to activate Decrease Intensity Regulator...")
+            print("Illumination in Office1 is above threshold (above 3000 lumens). Requesting Office1 to activate Decrease Intensity Regulator...")
         if (illumination > self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and 
             self.getDecreaseIntensityRegulatorActivatedFlagFromMessage(data)):
             print("Decrease Intensity Regulator is activated in Office1.")
         if (illumination <= self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and 
             self.getDecreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Illumination in Office1 has reached desired level. Requesting Office1 to stop Decrease Intensity Regulator...")
+            print("Illumination in Office1 has reached desired level (around 2300 lumens). Requesting Office1 to stop Decrease Intensity Regulator...")
 
     def on_message(self, frame):
         if frame.body.strip() != "":
