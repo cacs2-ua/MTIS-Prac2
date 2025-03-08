@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public class Oficina1 implements MessageListener {
 
-    // Atributo para almacenar la temperatura
+    // Atributo para almacenar la temperatura 
     private int temperature;
     
     private boolean coldSystemActivated = false;
@@ -298,8 +298,6 @@ public class Oficina1 implements MessageListener {
                         Oficina1.this.setTemperature(Utils.manejarTemperaturaRandomIndicator());
                     }
                     
-                    Oficina1.this.printOwnTemperatureInformation();
-                    
                     // Seg�n la condici�n, ejecutar la acci�n de gesti�n o enviar el mensaje de lectura
                     if (Oficina1.this.isHeatSystemActivated()) {
                         // Gesti�n del calor (llamada directa para facilitar la depuraci�n)
@@ -311,6 +309,8 @@ public class Oficina1 implements MessageListener {
                         // Mensaje de lectura normal
                         Oficina1.this.sendTemperatureMessage(jmsComponents.session, jmsComponents.producer);
                     }
+                    
+                    Oficina1.this.printOwnTemperatureInformation();
                     
                 } catch(Exception e) {
                     e.printStackTrace();
