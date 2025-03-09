@@ -1,0 +1,41 @@
+<?php return array(
+    'root' => array(
+        'name' => '__root__',
+        'pretty_version' => 'dev-develop',
+        'version' => 'dev-develop',
+        'reference' => '71d81fb5546e8dc0a86e10cacb540433f3757fff',
+        'type' => 'library',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'dev' => true,
+    ),
+    'versions' => array(
+        '__root__' => array(
+            'pretty_version' => 'dev-develop',
+            'version' => 'dev-develop',
+            'reference' => '71d81fb5546e8dc0a86e10cacb540433f3757fff',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'react/event-loop' => array(
+            'pretty_version' => 'v1.5.0',
+            'version' => '1.5.0.0',
+            'reference' => 'bbe0bd8c51ffc05ee43f1729087ed3bdf7d53354',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../react/event-loop',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'stomp-php/stomp-php' => array(
+            'pretty_version' => '5.1.2',
+            'version' => '5.1.2.0',
+            'reference' => '85e7ad490aeda7d23f8dd7c570aab08e096e40b6',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../stomp-php/stomp-php',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+    ),
+);
