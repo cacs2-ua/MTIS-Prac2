@@ -4,10 +4,10 @@
 const stompit = require('stompit');
 const Utils = require('./Utils');
 
-const temperatureDifference = 2;
+const temperatureDifference = 5;
 const heatSystemStopTemperature = 23;
 const coldSystemStopTemperature = 23;
-const illuminationIntensityDifference = 200;
+const illuminationIntensityDifference = 500;
 const increaseIntensityIlluminationRegulatorStopIntensity = 2300;
 const decreaseIntensityIlluminationRegulatorStopIntensity = 2300;
 
@@ -238,7 +238,7 @@ class Oficina2 {
                 });
             });
             
-            // Temperature task every 2 seconds
+            // Temperature task every 5 seconds
             setInterval(() => {
                 if (!this.coldSystemActivated && !this.heatSystemActivated) {
                     this.temperature = Utils.manejarTemperaturaRandomIndicator();
@@ -251,9 +251,9 @@ class Oficina2 {
                     this.sendTemperatureMessage(client);
                 }
                 this.printOwnTemperatureInformation();
-            }, 2000);
+            }, 5000);
             
-            // Illumination task every 2 seconds
+            // Illumination task every 5 seconds
             setInterval(() => {
                 if (!this.increaseIntensityIlluminationRegulatorActivated && !this.decreaseIntensityIlluminationRegulatorActivated) {
                     this.illuminationIntensity = Utils.manejarIlluminationIntensityRandomIndicator();
@@ -266,7 +266,7 @@ class Oficina2 {
                     this.sendIlluminationMessage(client);
                 }
                 this.printOwnIlluminationInformation();
-            }, 2000);
+            }, 5000);
         });
     }
 }

@@ -19,11 +19,11 @@ namespace mtis
         private bool increaseIntensityIlluminationRegulatorActivated = false;
         private bool decreaseIntensityIlluminationRegulatorActivated = false;
 
-        public const int TEMPERATURE_DIFFERENCE = 2;
+        public const int TEMPERATURE_DIFFERENCE = 5;
         public const int HEAT_SYSTEM_STOP_TEMPERATURE = 23;
         public const int COLD_SYSTEM_STOP_TEMPERATURE = 23;
 
-        public const int ILLUMINATION_INTENSITY_DIFFERENCE = 200;
+        public const int ILLUMINATION_INTENSITY_DIFFERENCE = 500;
         public const int INCREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY = 2300;
         public const int DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY = 2300;
 
@@ -525,7 +525,7 @@ namespace mtis
                     {
                         Console.WriteLine(ex);
                     }
-                    await Task.Delay(2000);
+                    await Task.Delay(5000);
                 }
             }, cts.Token);
 
@@ -558,7 +558,7 @@ namespace mtis
                     {
                         Console.WriteLine(ex);
                     }
-                    await Task.Delay(2000);
+                    await Task.Delay(5000);
                 }
             }, cts.Token);
 
