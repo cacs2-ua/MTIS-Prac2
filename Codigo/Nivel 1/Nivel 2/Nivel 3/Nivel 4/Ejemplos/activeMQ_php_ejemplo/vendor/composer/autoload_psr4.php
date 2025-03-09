@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Stomp\\' => array($vendorDir . '/stomp-php/stomp-php/src'),
+    'React\\EventLoop\\' => array($vendorDir . '/react/event-loop/src'),
 );

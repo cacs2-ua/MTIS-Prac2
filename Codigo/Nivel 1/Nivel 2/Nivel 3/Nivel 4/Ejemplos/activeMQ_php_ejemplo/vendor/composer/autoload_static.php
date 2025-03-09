@@ -11,12 +11,20 @@ class ComposerStaticInit0d6ac8357a3b5358a31c17046c1c2611
         array (
             'Stomp\\' => 6,
         ),
+        'R' => 
+        array (
+            'React\\EventLoop\\' => 16,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'Stomp\\' => 
         array (
             0 => __DIR__ . '/..' . '/stomp-php/stomp-php/src',
+        ),
+        'React\\EventLoop\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/react/event-loop/src',
         ),
     );
 
