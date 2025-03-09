@@ -92,17 +92,17 @@ class ConsolaCentral(stomp.ConnectionListener):
         temperature = data.get("temperature")
         print(f"Office 2 temperature: {temperature}°C")
         if (temperature > self.COLD_SYSTEM_ACTIVATION_TEMPERATURE and not data.get("cold_system_activated")):
-            print("Temperature in Office2 has exceeded 30C. Requesting Office2 to activate Cold System...")
+            print("Temperature in Office2 has exceeded 30ºC. Requesting Office2 to activate Cold System...")
         if (temperature > self.COLD_SYSTEM_STOP_TEMPERATURE and data.get("cold_system_activated")):
             print("Cold System is activated in Office2.")
         if (temperature <= self.COLD_SYSTEM_STOP_TEMPERATURE and data.get("cold_system_activated")):
-            print("Temperature in Office2 has reached 23C or less. Requesting Office2 to stop Cold System...")
+            print("Temperature in Office2 has reached 23ºC or less. Requesting Office2 to stop Cold System...")
         if (temperature < self.HEAT_SYSTEM_ACTIVATION_TEMPERATURE and not data.get("heat_system_activated")):
-            print("Temperature in Office2 is below 15C. Requesting Office2 to activate Heat System...")
+            print("Temperature in Office2 is below 15ºC. Requesting Office2 to activate Heat System...")
         if (temperature < self.HEAT_SYSTEM_STOP_TEMPERATURE and data.get("heat_system_activated")):
             print("Heat System is activated in Office2.")
         if (temperature >= self.HEAT_SYSTEM_STOP_TEMPERATURE and data.get("heat_system_activated")):
-            print("Temperature in Office2 has reached 23C or more. Requesting Office2 to stop Heat System...")
+            print("Temperature in Office2 has reached 23ºC or more. Requesting Office2 to stop Heat System...")
 
     def printOffice2IlluminationInformation(self, data):
         illumination = data.get("illumination_intensity")
@@ -277,7 +277,7 @@ class ConsolaCentral(stomp.ConnectionListener):
         conn.subscribe(destination=lecturas_illum_dest1, id=3, ack='auto')
         conn.subscribe(destination=lecturas_illum_dest2, id=4, ack='auto')
         
-        print("Waiting for asynchronous messages. Press Ctrl+C to exit...")
+        print("Central Console Starting... ")
         return conn, listener
 
 def main():

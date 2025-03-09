@@ -208,7 +208,7 @@ class Oficina2 {
                 console.log('Connection error: ' + error.message);
                 return;
             }
-            console.log("Office2 (Node.js) connected to broker.");
+            console.log("Office1 Starting... ");
             
             // Subscribe to actuador topics for Office2
             client.subscribe({destination: '/topic/actuador_temperatura_oficina2', ack: 'auto'}, (err, message) => {
