@@ -130,7 +130,7 @@ class Oficina2 {
     }
     
     printOwnTemperatureInformation() {
-        console.log("Temperature Sensor: " + this.temperature + "C");
+        console.log("Temperature Sensor: " + this.temperature + "ºC");
         if (this.coldSystemActivated) {
             console.log("Temperature Activator: Cold System activated.");
         }
@@ -155,37 +155,37 @@ class Oficina2 {
             if (data.temperature !== undefined) {
                 if (data.activate_cold_system) {
                     this.coldSystemActivated = true;
-                    console.log("Temperature Activator: Temperature has exceeded 30C. Activating Cold System...");
+                    console.log("Temperature Activator: Temperature has exceeded 30ºC. Activating Cold System...");
                 }
                 if (data.stop_cold_system) {
                     this.coldSystemActivated = false;
-                    console.log("Temperature Activator: Temperature has reached 23C or less. Stopping Cold System...");
+                    console.log("Temperature Activator: Temperature has reached 23ºC or less. Stopping Cold System...");
                 }
                 if (data.activate_heat_system) {
                     this.heatSystemActivated = true;
-                    console.log("Temperature Activator: Temperature is below 15C. Activating Heat System...");
+                    console.log("Temperature Activator: Temperature is below 15ºC. Activating Heat System...");
                 }
                 if (data.stop_heat_system) {
                     this.heatSystemActivated = false;
-                    console.log("Temperature Activator: Temperature has reached 23C or more. Stopping Heat System...");
+                    console.log("Temperature Activator: Temperature has reached 23ºC or more. Stopping Heat System...");
                 }
             }
             if (data.illumination_intensity !== undefined) {
                 if (data.activate_increase_intensity_illumination_regulator) {
                     this.increaseIntensityIlluminationRegulatorActivated = true;
-                    console.log("Illumination Activator: Illumination intensity is below threshold. Activating Increase Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity is below threshold (below 1500 lumens). Activating Increase Intensity Regulator...");
                 }
                 if (data.stop_increase_intensity_illumination_regulator) {
                     this.increaseIntensityIlluminationRegulatorActivated = false;
-                    console.log("Illumination Activator: Illumination intensity has reached desired level. Stopping Increase Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity has reached desired level (around 2300 lumens). Stopping Increase Intensity Regulator...");
                 }
                 if (data.activate_decrease_intensity_illumination_regulator) {
                     this.decreaseIntensityIlluminationRegulatorActivated = true;
-                    console.log("Illumination Activator: Illumination intensity is above threshold. Activating Decrease Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity is above threshold (above 3000 lumens). Activating Decrease Intensity Regulator...");
                 }
                 if (data.stop_decrease_intensity_illumination_regulator) {
                     this.decreaseIntensityIlluminationRegulatorActivated = false;
-                    console.log("Illumination Activator: Illumination intensity has reached desired level. Stopping Decrease Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity has reached desired level (around 2300 lumens). Stopping Decrease Intensity Regulator...");
                 }
             }
         } catch (e) {

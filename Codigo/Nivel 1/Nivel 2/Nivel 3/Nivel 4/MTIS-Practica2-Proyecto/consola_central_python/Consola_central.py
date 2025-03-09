@@ -54,17 +54,17 @@ class ConsolaCentral(stomp.ConnectionListener):
         temperature = self.getTemperatureFromMessage(data)
         print(f"Office 1 temperature: {temperature}°C")
         if (temperature > self.COLD_SYSTEM_ACTIVATION_TEMPERATURE and not self.getColdSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 has exceeded 30C. Requesting Office1 to activate Cold System...")
+            print("Temperature in Office1 has exceeded 30ºC. Requesting Office1 to activate Cold System...")
         if (temperature > self.COLD_SYSTEM_STOP_TEMPERATURE and self.getColdSystemActivatedFlagFromMessage(data)):
             print("Cold System is activated in Office1.")
         if (temperature <= self.COLD_SYSTEM_STOP_TEMPERATURE and self.getColdSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 has reached 23C or less. Requesting Office1 to stop Cold System...")
+            print("Temperature in Office1 has reached 23ºC or less. Requesting Office1 to stop Cold System...")
         if (temperature < self.HEAT_SYSTEM_ACTIVATION_TEMPERATURE and not self.getHeatSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 is below 15C. Requesting Office1 to activate Heat System...")
+            print("Temperature in Office1 is below 15ºC. Requesting Office1 to activate Heat System...")
         if (temperature < self.HEAT_SYSTEM_STOP_TEMPERATURE and self.getHeatSystemActivatedFlagFromMessage(data)):
             print("Heat System is activated in Office1.")
         if (temperature >= self.HEAT_SYSTEM_STOP_TEMPERATURE and self.getHeatSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 has reached 23C or more. Requesting Office1 to stop Heat System...")
+            print("Temperature in Office1 has reached 23ºC or more. Requesting Office1 to stop Heat System...")
 
     def printOffice1IlluminationInformation(self, data):
         illumination = self.getIlluminationIntensityFromMessage(data)
