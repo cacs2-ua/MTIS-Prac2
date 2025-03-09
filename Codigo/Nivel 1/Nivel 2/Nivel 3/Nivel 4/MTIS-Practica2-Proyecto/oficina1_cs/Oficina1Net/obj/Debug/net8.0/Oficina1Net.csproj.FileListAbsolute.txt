@@ -1,0 +1,41 @@
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\bin\Debug\net8.0\Oficina1Net.exe
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\bin\Debug\net8.0\Oficina1Net.deps.json
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\bin\Debug\net8.0\Oficina1Net.runtimeconfig.json
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\bin\Debug\net8.0\Oficina1Net.dll
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\bin\Debug\net8.0\Oficina1Net.pdb
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\bin\Debug\net8.0\Apache.NMS.dll
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\bin\Debug\net8.0\Apache.NMS.ActiveMQ.dll
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\bin\Debug\net8.0\ICSharpCode.SharpZipLib.dll
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\Oficina1Net.csproj.AssemblyReference.cache
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\Oficina1Net.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\Oficina1Net.AssemblyInfoInputs.cache
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\Oficina1Net.AssemblyInfo.cs
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\Oficina1Net.csproj.CoreCompileInputs.cache
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\Oficina1.7C27D3CF.Up2Date
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\Oficina1Net.dll
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\refint\Oficina1Net.dll
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\Oficina1Net.pdb
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\Oficina1Net.genruntimeconfig.cache
+C:\Users\Cris-SX\source\repos\Oficina1Net\Oficina1Net\obj\Debug\net8.0\ref\Oficina1Net.dll
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\bin\Debug\net8.0\Oficina1Net.exe
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\bin\Debug\net8.0\Oficina1Net.deps.json
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\bin\Debug\net8.0\Oficina1Net.runtimeconfig.json
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\bin\Debug\net8.0\Oficina1Net.dll
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\bin\Debug\net8.0\Oficina1Net.pdb
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\bin\Debug\net8.0\Apache.NMS.dll
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\bin\Debug\net8.0\Apache.NMS.ActiveMQ.dll
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\bin\Debug\net8.0\ICSharpCode.SharpZipLib.dll
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1Net.csproj.AssemblyReference.cache
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1Net.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1Net.AssemblyInfoInputs.cache
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1Net.AssemblyInfo.cs
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1Net.csproj.CoreCompileInputs.cache
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1Net.sourcelink.json
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1.7C27D3CF.Up2Date
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1Net.dll
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\refint\Oficina1Net.dll
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1Net.pdb
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\Oficina1Net.genruntimeconfig.cache
+C:\Users\Cris-SX\Desktop\UA\Segundo Cuatri\MTIS\Practicas\Practica 2\Codigo\Nivel 1\Nivel 2\Nivel 3\Nivel 4\MTIS-Practica2-Proyecto\oficina1_cs\Oficina1Net\obj\Debug\net8.0\ref\Oficina1Net.dll
