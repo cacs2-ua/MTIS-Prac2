@@ -1,0 +1,6 @@
+{
+    "require": {
+        "stomp-php/stomp-php": "*",
+        "react/event-loop": "*"
+    }
+}
