@@ -130,22 +130,22 @@ class Oficina2 {
     }
     
     printOwnTemperatureInformation() {
-        console.log("Office2 Temperature Sensor: " + this.temperature + "C");
+        console.log("Temperature Sensor: " + this.temperature + "C");
         if (this.coldSystemActivated) {
-            console.log("Office2 Temperature Activator: Cold System activated.");
+            console.log("Temperature Activator: Cold System activated.");
         }
         if (this.heatSystemActivated) {
-            console.log("Office2 Temperature Activator: Heat System activated.");
+            console.log("Temperature Activator: Heat System activated.");
         }
     }
     
     printOwnIlluminationInformation() {
-        console.log("Office2 Illumination Sensor: " + this.illuminationIntensity + " lumens");
+        console.log("Illumination Sensor: " + this.illuminationIntensity + " lumens");
         if (this.increaseIntensityIlluminationRegulatorActivated) {
-            console.log("Office2 Illumination Activator: Increase Intensity Regulator activated.");
+            console.log("Illumination Activator: Increase Intensity Regulator activated.");
         }
         if (this.decreaseIntensityIlluminationRegulatorActivated) {
-            console.log("Office2 Illumination Activator: Decrease Intensity Regulator activated.");
+            console.log("Illumination Activator: Decrease Intensity Regulator activated.");
         }
     }
     
@@ -155,37 +155,37 @@ class Oficina2 {
             if (data.temperature !== undefined) {
                 if (data.activate_cold_system) {
                     this.coldSystemActivated = true;
-                    console.log("Office2 Temperature Activator: Temperature has exceeded 30C. Activating Cold System...");
+                    console.log("Temperature Activator: Temperature has exceeded 30C. Activating Cold System...");
                 }
                 if (data.stop_cold_system) {
                     this.coldSystemActivated = false;
-                    console.log("Office2 Temperature Activator: Temperature has reached 23C or less. Stopping Cold System...");
+                    console.log("Temperature Activator: Temperature has reached 23C or less. Stopping Cold System...");
                 }
                 if (data.activate_heat_system) {
                     this.heatSystemActivated = true;
-                    console.log("Office2 Temperature Activator: Temperature is below 15C. Activating Heat System...");
+                    console.log("Temperature Activator: Temperature is below 15C. Activating Heat System...");
                 }
                 if (data.stop_heat_system) {
                     this.heatSystemActivated = false;
-                    console.log("Office2 Temperature Activator: Temperature has reached 23C or more. Stopping Heat System...");
+                    console.log("Temperature Activator: Temperature has reached 23C or more. Stopping Heat System...");
                 }
             }
             if (data.illumination_intensity !== undefined) {
                 if (data.activate_increase_intensity_illumination_regulator) {
                     this.increaseIntensityIlluminationRegulatorActivated = true;
-                    console.log("Office2 Illumination Activator: Illumination intensity is below threshold. Activating Increase Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity is below threshold. Activating Increase Intensity Regulator...");
                 }
                 if (data.stop_increase_intensity_illumination_regulator) {
                     this.increaseIntensityIlluminationRegulatorActivated = false;
-                    console.log("Office2 Illumination Activator: Illumination intensity has reached desired level. Stopping Increase Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity has reached desired level. Stopping Increase Intensity Regulator...");
                 }
                 if (data.activate_decrease_intensity_illumination_regulator) {
                     this.decreaseIntensityIlluminationRegulatorActivated = true;
-                    console.log("Office2 Illumination Activator: Illumination intensity is above threshold. Activating Decrease Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity is above threshold. Activating Decrease Intensity Regulator...");
                 }
                 if (data.stop_decrease_intensity_illumination_regulator) {
                     this.decreaseIntensityIlluminationRegulatorActivated = false;
-                    console.log("Office2 Illumination Activator: Illumination intensity has reached desired level. Stopping Decrease Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity has reached desired level. Stopping Decrease Intensity Regulator...");
                 }
             }
         } catch (e) {
