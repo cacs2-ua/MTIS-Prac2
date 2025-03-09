@@ -5,7 +5,7 @@
 // Make sure to run "composer install" so that the following classes are available:
 //   - Stomp\Client
 //   - Stomp\StatefulStomp
-//   - React\EventLoop\Factory (or React\EventLoop\Loop for v1)
+//   - React\EventLoop\Factory
 // Then run this script via: php Oficina1.php
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -51,7 +51,7 @@ class Oficina1
 
     public function __construct()
     {
-        // same initial values as Oficina1.java
+        // same initial values as in Oficina1.java
         $this->temperature = 0;
         $this->illuminationIntensity = 2300;
     }
@@ -74,7 +74,7 @@ class Oficina1
         $this->stomp->subscribe($this->topicActuadorTemperature, null, 'auto');
         $this->stomp->subscribe($this->topicActuadorIllumination, null, 'auto');
 
-        // We will continuously read frames in a small periodic timer
+        // Continuously read frames in a small periodic timer
         $this->loop->addPeriodicTimer(0.1, function () {
             if ($frame = $this->stomp->read()) {
                 // We have a message
@@ -82,13 +82,12 @@ class Oficina1
             }
         });
 
-        // 4) Schedule temperature task every 2 seconds
-        $this->loop->addPeriodicTimer(2.0, function () {
+        // Define temperature task
+        $temperatureTask = function () {
             // If no system is active, randomize temperature
             if (!$this->coldSystemActivated && !$this->heatSystemActivated) {
                 $this->temperature = Utils::manejarTemperaturaRandomIndicator();
             }
-
             if ($this->heatSystemActivated) {
                 $this->manageHeatSystem();
             } elseif ($this->coldSystemActivated) {
@@ -98,15 +97,14 @@ class Oficina1
                 $this->sendTemperatureMessage();
             }
             $this->printOwnTemperatureInformation();
-        });
+        };
 
-        // 5) Schedule illumination task every 2 seconds
-        $this->loop->addPeriodicTimer(2.0, function () {
+        // Define illumination task
+        $illuminationTask = function () {
             // If no regulator is active, randomize illumination
             if (!$this->increaseIntensityIlluminationRegulatorActivated && !$this->decreaseIntensityIlluminationRegulatorActivated) {
                 $this->illuminationIntensity = Utils::manejarIlluminationIntensityRandomIndicator();
             }
-
             if ($this->increaseIntensityIlluminationRegulatorActivated) {
                 $this->manageIncreaseIlluminationRegulator();
             } elseif ($this->decreaseIntensityIlluminationRegulatorActivated) {
@@ -116,13 +114,23 @@ class Oficina1
                 $this->sendIlluminationMessage();
             }
             $this->printOwnIlluminationInformation();
-        });
+        };
+
+        // Execute tasks immediately so messages appear without delay
+        $temperatureTask();
+        $illuminationTask();
+
+        // Schedule temperature task every 2 seconds
+        $this->loop->addPeriodicTimer(2.0, $temperatureTask);
+
+        // Schedule illumination task every 2 seconds
+        $this->loop->addPeriodicTimer(2.0, $illuminationTask);
 
         // Run the React event loop
         $this->loop->run();
     }
 
-    // ---- JMS-like onMessage (in reality, a frame read) ----
+    // ---- JMS-like onMessage (actually a frame read) ----
     private function onMessage($frame)
     {
         $body = $frame->getBody();
@@ -258,7 +266,6 @@ class Oficina1
 
     public function printOwnTemperatureInformation()
     {
-        // EXACT same lines as in Oficina1.java
         echo "Temperature Sensor: " . $this->temperature . "C\n";
         if ($this->coldSystemActivated) {
             echo "Temperature Activator: Cold System activated.\n";
@@ -270,7 +277,6 @@ class Oficina1
 
     public function printReceivedTemperatureInformation($json)
     {
-        // EXACT same lines as in Oficina1.java
         if (isset($json['activate_cold_system']) && $json['activate_cold_system'] === true) {
             echo "Temperature Activator: Temperature has exceeded 30C. Activating Cold System...\n";
         }
@@ -285,14 +291,14 @@ class Oficina1
         }
     }
 
-    // ---- Methods for incrementing/decrementing illumination ----
+    // ---- Methods for illumination ----
     private function sendIlluminationMessage()
     {
         $payloadArray = [
-            "office"                                       => "office1",
-            "illumination_intensity"                       => $this->illuminationIntensity,
-            "increase_intensity_regulator_activated"       => $this->increaseIntensityIlluminationRegulatorActivated,
-            "decrease_intensity_regulator_activated"       => $this->decreaseIntensityIlluminationRegulatorActivated
+            "office"                                 => "office1",
+            "illumination_intensity"                 => $this->illuminationIntensity,
+            "increase_intensity_regulator_activated" => $this->increaseIntensityIlluminationRegulatorActivated,
+            "decrease_intensity_regulator_activated" => $this->decreaseIntensityIlluminationRegulatorActivated
         ];
         $payloadJson = json_encode($payloadArray);
         $msg = new Message($payloadJson, ["content-type" => "application/json"]);
@@ -307,10 +313,10 @@ class Oficina1
         $this->illuminationIntensity += self::ILLUMINATION_INTENSITY_DIFFERENCE;
 
         $payloadArray = [
-            "office"                                       => "office1",
-            "illumination_intensity"                       => $this->illuminationIntensity,
-            "increase_intensity_regulator_activated"       => $this->increaseIntensityIlluminationRegulatorActivated,
-            "decrease_intensity_regulator_activated"       => $this->decreaseIntensityIlluminationRegulatorActivated
+            "office"                                 => "office1",
+            "illumination_intensity"                 => $this->illuminationIntensity,
+            "increase_intensity_regulator_activated" => $this->increaseIntensityIlluminationRegulatorActivated,
+            "decrease_intensity_regulator_activated" => $this->decreaseIntensityIlluminationRegulatorActivated
         ];
         $payloadJson = json_encode($payloadArray);
         $msg = new Message($payloadJson, ["content-type" => "application/json"]);
@@ -329,10 +335,10 @@ class Oficina1
         $this->illuminationIntensity -= self::ILLUMINATION_INTENSITY_DIFFERENCE;
 
         $payloadArray = [
-            "office"                                       => "office1",
-            "illumination_intensity"                       => $this->illuminationIntensity,
-            "increase_intensity_regulator_activated"       => $this->increaseIntensityIlluminationRegulatorActivated,
-            "decrease_intensity_regulator_activated"       => $this->decreaseIntensityIlluminationRegulatorActivated
+            "office"                                 => "office1",
+            "illumination_intensity"                 => $this->illuminationIntensity,
+            "increase_intensity_regulator_activated" => $this->increaseIntensityIlluminationRegulatorActivated,
+            "decrease_intensity_regulator_activated" => $this->decreaseIntensityIlluminationRegulatorActivated
         ];
         $payloadJson = json_encode($payloadArray);
         $msg = new Message($payloadJson, ["content-type" => "application/json"]);
@@ -345,7 +351,6 @@ class Oficina1
 
     public function printOwnIlluminationInformation()
     {
-        // EXACT same lines as in Oficina1.java
         echo "Illumination Sensor: " . $this->illuminationIntensity . " lumens\n";
         if ($this->increaseIntensityIlluminationRegulatorActivated) {
             echo "Illumination Activator: Increase Intensity Regulator activated.\n";
@@ -357,7 +362,6 @@ class Oficina1
 
     public function printReceivedIlluminationInformation($json)
     {
-        // EXACT same lines as in Oficina1.java
         if (isset($json['activate_increase_intensity_illumination_regulator'])
             && $json['activate_increase_intensity_illumination_regulator'] === true) {
             echo "Illumination Activator: Illumination intensity is below threshold (below 1500 lumens). Activating Increase Intensity Regulator...\n";
@@ -377,6 +381,6 @@ class Oficina1
     }
 }
 
-// ---- Entry point (equivalent to main method in Java) ----
+// ---- Entry point ---- 
 $oficina = new Oficina1();
 $oficina->start();
