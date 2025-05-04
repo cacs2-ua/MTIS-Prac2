@@ -251,7 +251,7 @@ class Oficina2 {
                     this.sendTemperatureMessage(client);
                 }
                 this.printOwnTemperatureInformation();
-            }, 5000);
+            }, 2000);
             
             // Illumination task every 5 seconds
             setInterval(() => {
@@ -266,7 +266,7 @@ class Oficina2 {
                     this.sendIlluminationMessage(client);
                 }
                 this.printOwnIlluminationInformation();
-            }, 5000);
+            }, 2000);
         });
     }
 }
