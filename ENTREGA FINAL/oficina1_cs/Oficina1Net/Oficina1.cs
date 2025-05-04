@@ -525,7 +525,7 @@ namespace mtis
                     {
                         Console.WriteLine(ex);
                     }
-                    await Task.Delay(5000);
+                    await Task.Delay(1000);
                 }
             }, cts.Token);
 
@@ -558,7 +558,7 @@ namespace mtis
                     {
                         Console.WriteLine(ex);
                     }
-                    await Task.Delay(5000);
+                    await Task.Delay(1000);
                 }
             }, cts.Token);
 
