@@ -52,73 +52,73 @@ class ConsolaCentral(stomp.ConnectionListener):
 
     def printOffice1TemperatureInformation(self, data):
         temperature = self.getTemperatureFromMessage(data)
-        print(f"Office 1 temperature: {temperature}°C")
+        print(f"Office 1 temperature: {temperature} °C")
         if (temperature > self.COLD_SYSTEM_ACTIVATION_TEMPERATURE and not self.getColdSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 has exceeded 30ºC. Requesting Office1 to activate Cold System...")
+            print("Temperature in Office1 has exceeded 30 ºC. Requesting Office1 to activate Cold System...")
         if (temperature > self.COLD_SYSTEM_STOP_TEMPERATURE and self.getColdSystemActivatedFlagFromMessage(data)):
-            print("Cold System is activated in Office1.")
+            print("Cold System is activated in Office1")
         if (temperature <= self.COLD_SYSTEM_STOP_TEMPERATURE and self.getColdSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 has reached 23ºC or less. Requesting Office1 to stop Cold System...")
+            print("Temperature in Office1 has reached 23 ºC or less. Requesting Office1 to stop Cold System...")
         if (temperature < self.HEAT_SYSTEM_ACTIVATION_TEMPERATURE and not self.getHeatSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 is below 15ºC. Requesting Office1 to activate Heat System...")
+            print("Temperature in Office1 is below 15 ºC. Requesting Office1 to activate Heat System...")
         if (temperature < self.HEAT_SYSTEM_STOP_TEMPERATURE and self.getHeatSystemActivatedFlagFromMessage(data)):
-            print("Heat System is activated in Office1.")
+            print("Heat System is activated in Office1")
         if (temperature >= self.HEAT_SYSTEM_STOP_TEMPERATURE and self.getHeatSystemActivatedFlagFromMessage(data)):
-            print("Temperature in Office1 has reached 23ºC or more. Requesting Office1 to stop Heat System...")
+            print("Temperature in Office1 has reached 23 ºC or more. Requesting Office1 to stop Heat System...")
 
     def printOffice1IlluminationInformation(self, data):
         illumination = self.getIlluminationIntensityFromMessage(data)
-        print(f"Office 1 illumination: {illumination} lumens")
+        print(f"Office 1 illumination: {illumination} lm")
         if (illumination < self.INCREASE_INTENSITY_ILLUMINATION_REGULATOR_ACTIVATION_INTENSITY and 
             not self.getIncreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Illumination in Office1 is below threshold (below 1500 lumens). Requesting Office1 to activate Increase Intensity Regulator...")
+            print("Illumination in Office1 is below threshold (below 1500 lm). Requesting Office1 to activate Increase Intensity Regulator...")
         if (illumination < self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and 
             self.getIncreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Increase Intensity Regulator is activated in Office1.")
+            print("Increase Intensity Regulator is activated in Office1")
         if (illumination >= self.INCREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and 
             self.getIncreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Illumination in Office1 has reached desired level (around 2300 lumens). Requesting Office1 to stop Increase Intensity Regulator...")
+            print("Illumination in Office1 has reached desired level (around 2300 lm). Requesting Office1 to stop Increase Intensity Regulator...")
         if (illumination > self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_ACTIVATION_INTENSITY and 
             not self.getDecreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Illumination in Office1 is above threshold (above 3000 lumens). Requesting Office1 to activate Decrease Intensity Regulator...")
+            print("Illumination in Office1 is above threshold (above 3000 lm). Requesting Office1 to activate Decrease Intensity Regulator...")
         if (illumination > self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and 
             self.getDecreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Decrease Intensity Regulator is activated in Office1.")
+            print("Decrease Intensity Regulator is activated in Office1")
         if (illumination <= self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and 
             self.getDecreaseIntensityRegulatorActivatedFlagFromMessage(data)):
-            print("Illumination in Office1 has reached desired level (around 2300 lumens). Requesting Office1 to stop Decrease Intensity Regulator...")
+            print("Illumination in Office1 has reached desired level (around 2300 lm). Requesting Office1 to stop Decrease Intensity Regulator...")
 
     def printOffice2TemperatureInformation(self, data):
         temperature = data.get("temperature")
-        print(f"Office 2 temperature: {temperature}°C")
+        print(f"Office 2 temperature: {temperature} °C")
         if (temperature > self.COLD_SYSTEM_ACTIVATION_TEMPERATURE and not data.get("cold_system_activated")):
-            print("Temperature in Office2 has exceeded 30ºC. Requesting Office2 to activate Cold System...")
+            print("Temperature in Office2 has exceeded 30 ºC. Requesting Office2 to activate Cold System...")
         if (temperature > self.COLD_SYSTEM_STOP_TEMPERATURE and data.get("cold_system_activated")):
-            print("Cold System is activated in Office2.")
+            print("Cold System is activated in Office2")
         if (temperature <= self.COLD_SYSTEM_STOP_TEMPERATURE and data.get("cold_system_activated")):
-            print("Temperature in Office2 has reached 23ºC or less. Requesting Office2 to stop Cold System...")
+            print("Temperature in Office2 has reached 23 ºC or less. Requesting Office2 to stop Cold System...")
         if (temperature < self.HEAT_SYSTEM_ACTIVATION_TEMPERATURE and not data.get("heat_system_activated")):
-            print("Temperature in Office2 is below 15ºC. Requesting Office2 to activate Heat System...")
+            print("Temperature in Office2 is below 15 ºC. Requesting Office2 to activate Heat System...")
         if (temperature < self.HEAT_SYSTEM_STOP_TEMPERATURE and data.get("heat_system_activated")):
-            print("Heat System is activated in Office2.")
+            print("Heat System is activated in Office2")
         if (temperature >= self.HEAT_SYSTEM_STOP_TEMPERATURE and data.get("heat_system_activated")):
-            print("Temperature in Office2 has reached 23ºC or more. Requesting Office2 to stop Heat System...")
+            print("Temperature in Office2 has reached 23 ºC or more. Requesting Office2 to stop Heat System...")
 
     def printOffice2IlluminationInformation(self, data):
         illumination = data.get("illumination_intensity")
-        print(f"Office 2 illumination: {illumination} lumens")
+        print(f"Office 2 illumination: {illumination} lm")
         if (illumination < self.INCREASE_INTENSITY_ILLUMINATION_REGULATOR_ACTIVATION_INTENSITY and not data.get("increase_intensity_regulator_activated")):
-            print("Illumination in Office2 is below threshold (below 1500 lumens). Requesting Office2 to activate Increase Intensity Regulator...")
+            print("Illumination in Office2 is below threshold (below 1500 lm). Requesting Office2 to activate Increase Intensity Regulator...")
         if (illumination < self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and data.get("increase_intensity_regulator_activated")):
-            print("Increase Intensity Regulator is activated in Office2.")
+            print("Increase Intensity Regulator is activated in Office2")
         if (illumination >= self.INCREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and data.get("increase_intensity_regulator_activated")):
-            print("Illumination in Office2 has reached desired level (around 2300 lumens). Requesting Office2 to stop Increase Intensity Regulator...")
+            print("Illumination in Office2 has reached desired level (around 2300 lm). Requesting Office2 to stop Increase Intensity Regulator...")
         if (illumination > self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_ACTIVATION_INTENSITY and not data.get("decrease_intensity_regulator_activated")):
-            print("Illumination in Office2 is above threshold (above 3000 lumens). Requesting Office2 to activate Decrease Intensity Regulator...")
+            print("Illumination in Office2 is above threshold (above 3000 lm). Requesting Office2 to activate Decrease Intensity Regulator...")
         if (illumination > self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and data.get("decrease_intensity_regulator_activated")):
-            print("Decrease Intensity Regulator is activated in Office2.")
+            print("Decrease Intensity Regulator is activated in Office2")
         if (illumination <= self.DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY and data.get("decrease_intensity_regulator_activated")):
-            print("Illumination in Office2 has reached desired level (around 2300 lumens). Requesting Office2 to stop Decrease Intensity Regulator...")
+            print("Illumination in Office2 has reached desired level (around 2300 lm). Requesting Office2 to stop Decrease Intensity Regulator...")
 
     def manage_temperature_system(self, office, temperature_numeric_value, cold_system_activated, heat_system_activated, actuador_dest):
         if (temperature_numeric_value > self.COLD_SYSTEM_ACTIVATION_TEMPERATURE and not cold_system_activated):
@@ -201,7 +201,7 @@ class ConsolaCentral(stomp.ConnectionListener):
             try:
                 data = json.loads(frame.body)
             except json.JSONDecodeError:
-                print("Error decoding JSON.")
+                print("Error decoding JSON")
                 return
 
             office = data.get("office")
@@ -211,7 +211,7 @@ class ConsolaCentral(stomp.ConnectionListener):
                     try:
                         temperature_numeric_value = int(data.get("temperature"))
                     except (ValueError, TypeError):
-                        print("Temperature value missing or invalid.")
+                        print("Temperature value missing or invalid")
                     else:
                         if office == "office1":
                             self.manage_temperature_system(office, temperature_numeric_value,
@@ -230,7 +230,7 @@ class ConsolaCentral(stomp.ConnectionListener):
                     try:
                         illumination_numeric_value = int(data.get("illumination_intensity"))
                     except (ValueError, TypeError):
-                        print("Illumination value missing or invalid.")
+                        print("Illumination value missing or invalid")
                     else:
                         if office == "office1":
                             self.manage_illumination_system(office,
@@ -247,9 +247,9 @@ class ConsolaCentral(stomp.ConnectionListener):
                                                            self.actuador_illum_dest2)
                             self.printOffice2IlluminationInformation(data)
             else:
-                print("Unknown office value.")
+                print("Unknown office value")
         else:
-            print("Received empty message.")
+            print("Received empty message")
 
     @staticmethod
     def setup_connection():

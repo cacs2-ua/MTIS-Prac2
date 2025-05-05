@@ -19,11 +19,11 @@ namespace mtis
         private bool increaseIntensityIlluminationRegulatorActivated = false;
         private bool decreaseIntensityIlluminationRegulatorActivated = false;
 
-        public const int TEMPERATURE_DIFFERENCE = 5;
+        public const int TEMPERATURE_DIFFERENCE = 3;
         public const int HEAT_SYSTEM_STOP_TEMPERATURE = 23;
         public const int COLD_SYSTEM_STOP_TEMPERATURE = 23;
 
-        public const int ILLUMINATION_INTENSITY_DIFFERENCE = 500;
+        public const int ILLUMINATION_INTENSITY_DIFFERENCE = 300;
         public const int INCREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY = 2300;
         public const int DECREASE_INTENSITY_ILLUMINATION_REGULATOR_STOP_INTENSITY = 2300;
 
@@ -78,7 +78,7 @@ namespace mtis
         /// </summary>
         private JMSComponents SetupJMS()
         {
-            Console.WriteLine("Office1 Starting... ");
+            Console.WriteLine("Office1 Starting...");
             string url = "tcp://localhost:61616";
 
             // Crear la conexión y la sesión
@@ -256,14 +256,14 @@ namespace mtis
 
         public void PrintOwnTemperatureInformation()
         {
-            Console.WriteLine("Temperature Sensor: " + this.temperature + "ºC");
+            Console.WriteLine("Temperature Sensor: " + this.temperature + " ºC");
             if (this.coldSystemActivated)
             {
-                Console.WriteLine("Temperature Activator: Cold System activated.");
+                Console.WriteLine("Temperature Activator: Cold System activated");
             }
             if (this.heatSystemActivated)
             {
-                Console.WriteLine("Temperature Activator: Heat System activated.");
+                Console.WriteLine("Temperature Activator: Heat System activated");
             }
         }
 
@@ -406,14 +406,14 @@ namespace mtis
 
         public void PrintOwnIlluminationInformation()
         {
-            Console.WriteLine("Illumination Sensor: " + this.illuminationIntensity + " lumens");
+            Console.WriteLine("Illumination Sensor: " + this.illuminationIntensity + " lm");
             if (this.increaseIntensityIlluminationRegulatorActivated)
             {
-                Console.WriteLine("Illumination Activator: Increase Intensity Regulator activated.");
+                Console.WriteLine("Illumination Activator: Increase Intensity Regulator activated");
             }
             if (this.decreaseIntensityIlluminationRegulatorActivated)
             {
-                Console.WriteLine("Illumination Activator: Decrease Intensity Regulator activated.");
+                Console.WriteLine("Illumination Activator: Decrease Intensity Regulator activated");
             }
         }
 
@@ -421,19 +421,19 @@ namespace mtis
         {
             if (GetActivateIncreaseIntensityFlag(text).HasValue && GetActivateIncreaseIntensityFlag(text).Value)
             {
-                Console.WriteLine("Illumination Activator: Illumination intensity is below threshold (below 1500 lumens). Activating Increase Intensity Regulator...");
+                Console.WriteLine("Illumination Activator: Illumination intensity is below threshold (below 1500 lm). Activating Increase Intensity Regulator...");
             }
             if (GetStopIncreaseIntensityFlag(text).HasValue && GetStopIncreaseIntensityFlag(text).Value)
             {
-                Console.WriteLine("Illumination Activator: Illumination intensity has reached desired level (around 2300 lumens). Stopping Increase Intensity Regulator...");
+                Console.WriteLine("Illumination Activator: Illumination intensity has reached desired level (around 2300 lm). Stopping Increase Intensity Regulator...");
             }
             if (GetActivateDecreaseIntensityFlag(text).HasValue && GetActivateDecreaseIntensityFlag(text).Value)
             {
-                Console.WriteLine("Illumination Activator: Illumination intensity is above threshold (above 3000 lumens). Activating Decrease Intensity Regulator...");
+                Console.WriteLine("Illumination Activator: Illumination intensity is above threshold (above 3000 lm). Activating Decrease Intensity Regulator...");
             }
             if (GetStopDecreaseIntensityFlag(text).HasValue && GetStopDecreaseIntensityFlag(text).Value)
             {
-                Console.WriteLine("Illumination Activator: Illumination intensity has reached desired level (around 2300 lumens). Stopping Decrease Intensity Regulator...");
+                Console.WriteLine("Illumination Activator: Illumination intensity has reached desired level (around 2300 lm). Stopping Decrease Intensity Regulator...");
             }
         }
 
@@ -472,19 +472,19 @@ namespace mtis
         {
             if (GetActivateColdSystemFlag(text).HasValue && GetActivateColdSystemFlag(text).Value)
             {
-                Console.WriteLine("Temperature Activator: Temperature has exceeded 30ºC. Activating Cold System...");
+                Console.WriteLine("Temperature Activator: Temperature has exceeded 30 ºC. Activating Cold System...");
             }
             if (GetStopColdSystemFlag(text).HasValue && GetStopColdSystemFlag(text).Value)
             {
-                Console.WriteLine("Temperature Activator: Temperature has reached 23ºC or less. Stopping Cold System...");
+                Console.WriteLine("Temperature Activator: Temperature has reached 23 ºC or less. Stopping Cold System...");
             }
             if (GetActivateHeatSystemFlag(text).HasValue && GetActivateHeatSystemFlag(text).Value)
             {
-                Console.WriteLine("Temperature Activator: Temperature is below 15ºC. Activating Heat System...");
+                Console.WriteLine("Temperature Activator: Temperature is below 15 ºC. Activating Heat System...");
             }
             if (GetStopHeatSystemFlag(text).HasValue && GetStopHeatSystemFlag(text).Value)
             {
-                Console.WriteLine("Temperature Activator: Temperature has reached 23ºC or more. Stopping Heat System...");
+                Console.WriteLine("Temperature Activator: Temperature has reached 23 ºC or more. Stopping Heat System...");
             }
         }
 
@@ -525,7 +525,7 @@ namespace mtis
                     {
                         Console.WriteLine(ex);
                     }
-                    await Task.Delay(1000);
+                    await Task.Delay(3000);
                 }
             }, cts.Token);
 
@@ -558,7 +558,7 @@ namespace mtis
                     {
                         Console.WriteLine(ex);
                     }
-                    await Task.Delay(1000);
+                    await Task.Delay(3000);
                 }
             }, cts.Token);
 

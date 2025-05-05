@@ -4,10 +4,10 @@
 const stompit = require('stompit');
 const Utils = require('./Utils');
 
-const temperatureDifference = 5;
+const temperatureDifference = 3;
 const heatSystemStopTemperature = 23;
 const coldSystemStopTemperature = 23;
-const illuminationIntensityDifference = 500;
+const illuminationIntensityDifference = 300;
 const increaseIntensityIlluminationRegulatorStopIntensity = 2300;
 const decreaseIntensityIlluminationRegulatorStopIntensity = 2300;
 
@@ -130,22 +130,22 @@ class Oficina2 {
     }
     
     printOwnTemperatureInformation() {
-        console.log("Temperature Sensor: " + this.temperature + "ºC");
+        console.log("Temperature Sensor: " + this.temperature + " ºC");
         if (this.coldSystemActivated) {
-            console.log("Temperature Activator: Cold System activated.");
+            console.log("Temperature Activator: Cold System activated");
         }
         if (this.heatSystemActivated) {
-            console.log("Temperature Activator: Heat System activated.");
+            console.log("Temperature Activator: Heat System activated");
         }
     }
     
     printOwnIlluminationInformation() {
-        console.log("Illumination Sensor: " + this.illuminationIntensity + " lumens");
+        console.log("Illumination Sensor: " + this.illuminationIntensity + " lm");
         if (this.increaseIntensityIlluminationRegulatorActivated) {
-            console.log("Illumination Activator: Increase Intensity Regulator activated.");
+            console.log("Illumination Activator: Increase Intensity Regulator activated");
         }
         if (this.decreaseIntensityIlluminationRegulatorActivated) {
-            console.log("Illumination Activator: Decrease Intensity Regulator activated.");
+            console.log("Illumination Activator: Decrease Intensity Regulator activated");
         }
     }
     
@@ -155,37 +155,37 @@ class Oficina2 {
             if (data.temperature !== undefined) {
                 if (data.activate_cold_system) {
                     this.coldSystemActivated = true;
-                    console.log("Temperature Activator: Temperature has exceeded 30ºC. Activating Cold System...");
+                    console.log("Temperature Activator: Temperature has exceeded 30 ºC. Activating Cold System...");
                 }
                 if (data.stop_cold_system) {
                     this.coldSystemActivated = false;
-                    console.log("Temperature Activator: Temperature has reached 23ºC or less. Stopping Cold System...");
+                    console.log("Temperature Activator: Temperature has reached 23 ºC or less. Stopping Cold System...");
                 }
                 if (data.activate_heat_system) {
                     this.heatSystemActivated = true;
-                    console.log("Temperature Activator: Temperature is below 15ºC. Activating Heat System...");
+                    console.log("Temperature Activator: Temperature is below 15 ºC. Activating Heat System...");
                 }
                 if (data.stop_heat_system) {
                     this.heatSystemActivated = false;
-                    console.log("Temperature Activator: Temperature has reached 23ºC or more. Stopping Heat System...");
+                    console.log("Temperature Activator: Temperature has reached 23 ºC or more. Stopping Heat System...");
                 }
             }
             if (data.illumination_intensity !== undefined) {
                 if (data.activate_increase_intensity_illumination_regulator) {
                     this.increaseIntensityIlluminationRegulatorActivated = true;
-                    console.log("Illumination Activator: Illumination intensity is below threshold (below 1500 lumens). Activating Increase Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity is below threshold (below 1500 lm). Activating Increase Intensity Regulator...");
                 }
                 if (data.stop_increase_intensity_illumination_regulator) {
                     this.increaseIntensityIlluminationRegulatorActivated = false;
-                    console.log("Illumination Activator: Illumination intensity has reached desired level (around 2300 lumens). Stopping Increase Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity has reached desired level (around 2300 lm). Stopping Increase Intensity Regulator...");
                 }
                 if (data.activate_decrease_intensity_illumination_regulator) {
                     this.decreaseIntensityIlluminationRegulatorActivated = true;
-                    console.log("Illumination Activator: Illumination intensity is above threshold (above 3000 lumens). Activating Decrease Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity is above threshold (above 3000 lm). Activating Decrease Intensity Regulator...");
                 }
                 if (data.stop_decrease_intensity_illumination_regulator) {
                     this.decreaseIntensityIlluminationRegulatorActivated = false;
-                    console.log("Illumination Activator: Illumination intensity has reached desired level (around 2300 lumens). Stopping Decrease Intensity Regulator...");
+                    console.log("Illumination Activator: Illumination intensity has reached desired level (around 2300 lm). Stopping Decrease Intensity Regulator...");
                 }
             }
         } catch (e) {
@@ -208,7 +208,7 @@ class Oficina2 {
                 console.log('Connection error: ' + error.message);
                 return;
             }
-            console.log("Office2 Starting... ");
+            console.log("Office2 Starting...");
             
             // Subscribe to actuador topics for Office2
             client.subscribe({destination: '/topic/actuador_temperatura_oficina2', ack: 'auto'}, (err, message) => {
@@ -251,7 +251,7 @@ class Oficina2 {
                     this.sendTemperatureMessage(client);
                 }
                 this.printOwnTemperatureInformation();
-            }, 1000);
+            }, 3000);
             
             // Illumination task every 5 seconds
             setInterval(() => {
@@ -266,7 +266,7 @@ class Oficina2 {
                     this.sendIlluminationMessage(client);
                 }
                 this.printOwnIlluminationInformation();
-            }, 1000);
+            }, 3000);
         });
     }
 }
